@@ -1,136 +1,190 @@
 let requestList = [];
+let sortAscending = true;
 
+// PAGE NAV
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// LOAD DATA (10,000 tickets)
 async function loadData() {
-  const container = document.getElementById("summary");
-  container.innerHTML = "Loading CityPulse data...";
-
   const url =
     "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=10000";
 
   const res = await fetch(url);
   const data = await res.json();
 
-  const records = data.result.records;
-
-  // CLEANING (Java-style strict filtering)
-  requestList = records
+  requestList = data.result.records
     .filter(r =>
       r.open_dt &&
       r.closed_dt &&
       r.neighborhood &&
-      r.neighborhood !== "null" &&
-      r.neighborhood.trim() !== ""
+      r.neighborhood !== "null"
     )
     .map(r => ({
-      neighborhood: r.neighborhood,
-      openDate: r.open_dt,
-      closedDate: r.closed_dt
+      neighborhood: normalize(r.neighborhood),
+      open: r.open_dt,
+      close: r.closed_dt
     }));
 
-  container.innerHTML = "";
-  renderDashboard();
-  renderSummary();
-  renderChart();
+  renderAll();
 }
 
-function calculateHours(openDate, closedDate) {
-  const open = Date.parse(openDate);
-  const closed = Date.parse(closedDate);
+// CLEAN NAMES
+function normalize(n) {
+  n = n.toLowerCase();
 
-  if (isNaN(open) || isNaN(closed)) return -1;
+  if (n.includes("allston") && n.includes("brighton")) return "Allston-Brighton";
+  if (n.includes("fenway")) return "Fenway/Kenmore";
+  if (n.includes("south boston")) return "South Boston";
+  if (n.includes("jamaica plain")) return "Jamaica Plain";
 
-  return (closed - open) / (1000 * 60 * 60);
+  return n.split(" ").map(w => w[0]?.toUpperCase() + w.slice(1)).join(" ");
 }
 
+// TIME
+function hours(open, close) {
+  return (Date.parse(close) - Date.parse(open)) / 36e5;
+}
+
+// MEDIAN
+function median(arr) {
+  arr = arr.sort((a, b) => a - b);
+  let m = Math.floor(arr.length / 2);
+  return arr.length % 2 ? arr[m] : (arr[m - 1] + arr[m]) / 2;
+}
+
+// STATS
 function getStats() {
-  let stats = {};
+  let map = {};
 
   requestList.forEach(r => {
-    const hours = calculateHours(r.openDate, r.closedDate);
-    if (hours < 0) return;
+    let h = hours(r.open, r.close);
+    if (h < 0) return;
 
-    if (!stats[r.neighborhood]) {
-      stats[r.neighborhood] = { total: 0, count: 0 };
-    }
-
-    stats[r.neighborhood].total += hours;
-    stats[r.neighborhood].count += 1;
+    if (!map[r.neighborhood]) map[r.neighborhood] = [];
+    map[r.neighborhood].push(h);
   });
 
-  let result = [];
+  let out = [];
 
-  for (let n in stats) {
-    const avg = stats[n].total / stats[n].count;
+  for (let n in map) {
+    if (map[n].length < 10) continue;
 
-    result.push({
+    out.push({
       name: n,
-      avgHours: avg,
-      count: stats[n].count,
-      underservedScore: avg * Math.log(stats[n].count + 1)
+      median: median(map[n]),
+      count: map[n].length
     });
   }
 
-  result.sort((a, b) => a.avgHours - b.avgHours);
-
-  return result;
+  return out;
 }
 
-function renderDashboard() {
-  const container = document.getElementById("output");
-  container.innerHTML = "";
-
-  const stats = getStats();
-
-  stats.forEach((s, i) => {
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-      <div>
-        <div class="rank">#${i + 1} ${s.name}</div>
-        <div>${s.avgHours.toFixed(1)} hrs • ${s.count} tickets</div>
-      </div>
-      <div class="${s.avgHours > 72 ? "bad" : "good"}">
-        Score: ${s.underservedScore.toFixed(1)}
-      </div>
-    `;
-
-    container.appendChild(div);
-  });
+// DASHBOARD
+function renderAll() {
+  renderSummary();
+  renderChart();
+  renderRankings();
 }
 
+// SUMMARY
 function renderSummary() {
-  const stats = getStats();
+  let stats = getStats();
 
-  const avgCity =
-    stats.reduce((sum, s) => sum + s.avgHours, 0) / stats.length;
-
-  const summary = document.getElementById("summary");
-
-  summary.innerHTML = `
-    <b>${stats.length}</b> neighborhoods analyzed |
-    Avg city response: <b>${avgCity.toFixed(1)} hrs</b>
+  document.getElementById("summary").innerHTML = `
+    <b>${stats.length}</b> neighborhoods analyzed (min 10 tickets)
   `;
 }
 
+// CHART
 function renderChart() {
-  const stats = getStats().slice(0, 10);
+  let stats = getStats().slice(0, 10);
 
-  const ctx = document.getElementById("chart");
-
-  new Chart(ctx, {
+  new Chart(document.getElementById("chart"), {
     type: "bar",
     data: {
       labels: stats.map(s => s.name),
       datasets: [{
-        label: "Avg Response Time (hrs)",
-        data: stats.map(s => s.avgHours)
+        label: "Median Hours",
+        data: stats.map(s => s.median)
       }]
-    },
-    options: {
-      responsive: true
     }
   });
 }
+
+// RANKINGS
+function renderRankings() {
+  let stats = getStats();
+
+  stats.sort((a, b) =>
+    sortAscending ? a.median - b.median : b.median - a.median
+  );
+
+  let box = document.getElementById("rankingList");
+  box.innerHTML = "";
+
+  stats.forEach((s, i) => {
+    let div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div>#${i + 1} ${s.name}</div>
+      <div>${s.median.toFixed(1)} hrs (${s.count})</div>
+    `;
+
+    box.appendChild(div);
+  });
+}
+
+// TOGGLE SORT
+function toggleSort() {
+  sortAscending = !sortAscending;
+
+  document.getElementById("sortBtn").innerText =
+    sortAscending ? "Sort: Fastest → Slowest" : "Sort: Slowest → Fastest";
+
+  renderRankings();
+}
+
+// SIMULATOR
+function runSim() {
+  let target = document.getElementById("slider").value;
+
+  document.getElementById("sliderVal").innerText =
+    target + " hours";
+
+  let stats = getStats();
+
+  let pass = 0;
+
+  let res = document.getElementById("simResults");
+  res.innerHTML = "";
+
+  stats.forEach(s => {
+    let ok = s.median <= target;
+
+    if (ok) pass++;
+
+    let div = document.createElement("div");
+    div.className = "card";
+    div.innerText =
+      (ok ? "✔ " : "✖ ") + s.name + " — " + s.median.toFixed(1) + " hrs";
+
+    res.appendChild(div);
+  });
+
+  document.getElementById("simSummary").innerText =
+    `${pass}/${stats.length} neighborhoods meet target`;
+}
+
+// SLIDER LIVE UPDATE
+document.addEventListener("input", e => {
+  if (e.target.id === "slider") {
+    document.getElementById("sliderVal").innerText =
+      e.target.value + " hours";
+  }
+});
 
 loadData();

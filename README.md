@@ -1,1 +1,2 @@
-# citypulse: underserved neighborhoods in Boston based on response time analysis 
+CityPulse Boston 311 Dashboard
+CityPulse is a static website version of the original JavaFX project. It loads recent Boston 311 service request records, groups closed requests by neighborhood, ranks average resolution time, and includes a target simulator.

@@ -1,16 +1,207 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>CityPulse Boston</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>CityPulse Boston 311 Dashboard</h1>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CityPulse Boston 311 Dashboard</title>
+    <meta
+      name="description"
+      content="CityPulse turns Boston 311 service request data into neighborhood response-time rankings, equity stats, and target simulations."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <nav class="topbar" aria-label="Primary">
+        <a class="brand" href="#overview" aria-label="CityPulse home">
+          <span class="brand-mark" aria-hidden="true">CP</span>
+          <span>CityPulse</span>
+        </a>
+        <div class="nav-links">
+          <a href="#rankings">Rankings</a>
+          <a href="#simulator">Simulator</a>
+          <a href="#action">Action</a>
+        </div>
+      </nav>
 
-  <p>Underserved neighborhoods based on response time analysis</p>
+      <section class="hero" id="overview">
+        <div class="hero-copy">
+          <p class="eyebrow">Boston 311 service response dashboard</p>
+          <h1>CityPulse shows where neighborhood requests get resolved fastest.</h1>
+          <p>
+            Explore live public service request data from Boston 311, compare average wait times by
+            neighborhood, and test whether areas meet a response-time target.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#rankings">View rankings</a>
+            <a class="secondary-action" href="#simulator">Run target simulator</a>
+          </div>
+        </div>
 
-  <div id="output"></div>
+        <aside class="status-panel" aria-label="Current data status">
+          <div class="status-row">
+            <span>Data source</span>
+            <strong>Analyze Boston</strong>
+          </div>
+          <div class="status-row">
+            <span>Records requested</span>
+            <strong id="record-limit">2,500</strong>
+          </div>
+          <div class="status-row">
+            <span>Dashboard status</span>
+            <strong id="load-status">Loading live data</strong>
+          </div>
+        </aside>
+      </section>
+    </header>
 
-  <script src="app.js"></script>
-</body>
+    <main>
+      <section class="metric-band" aria-label="Citywide snapshot">
+        <article>
+          <span class="metric-label">Valid requests</span>
+          <strong id="total-requests">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Neighborhoods</span>
+          <strong id="total-neighborhoods">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Citywide average</span>
+          <strong id="city-average">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Fastest area</span>
+          <strong id="fastest-area">--</strong>
+        </article>
+      </section>
+
+      <section class="section-grid" id="rankings">
+        <div class="section-intro">
+          <p class="eyebrow">Neighborhood equity rankings</p>
+          <h2>Compare average 311 resolution time by neighborhood.</h2>
+          <p>
+            Rankings are based on closed service requests with valid open and closed timestamps.
+            Lower average hours means faster resolution.
+          </p>
+        </div>
+
+        <div class="tool-surface">
+          <div class="control-row">
+            <label class="search-field">
+              <span>Filter neighborhoods</span>
+              <input id="neighborhood-search" type="search" placeholder="Type a neighborhood">
+            </label>
+            <button class="icon-button" id="sort-toggle" type="button" aria-pressed="false">
+              Slowest first
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Neighborhood</th>
+                  <th scope="col">Avg hours</th>
+                  <th scope="col">Avg days</th>
+                  <th scope="col">Tickets</th>
+                </tr>
+              </thead>
+              <tbody id="ranking-body">
+                <tr>
+                  <td colspan="5">Loading rankings...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-grid alt" id="simulator">
+        <div class="section-intro">
+          <p class="eyebrow">Target simulator</p>
+          <h2>Set a response goal and see who meets it.</h2>
+          <p>
+            Use the slider to test a resolution-time target from half a day to one week. CityPulse
+            compares each neighborhood average against the selected goal.
+          </p>
+        </div>
+
+        <div class="tool-surface">
+          <div class="slider-header">
+            <label for="target-slider">Target resolution time</label>
+            <strong id="target-label">72.0 hours (3.0 days)</strong>
+          </div>
+          <input id="target-slider" type="range" min="12" max="168" value="72" step="1">
+          <div class="sim-summary" id="sim-summary">Waiting for live data...</div>
+          <div class="result-list" id="sim-results" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="section-grid" id="raw-stats">
+        <div class="section-intro">
+          <p class="eyebrow">Raw neighborhood stats</p>
+          <h2>Scan the underlying averages.</h2>
+          <p>
+            This section mirrors your original Java project’s neighborhood-by-neighborhood summary
+            and keeps the ticket counts visible so the results are easier to judge.
+          </p>
+        </div>
+
+        <div class="stat-list" id="stats-list">
+          <p>Loading neighborhood statistics...</p>
+        </div>
+      </section>
+
+      <section class="info-band" id="about">
+        <div>
+          <p class="eyebrow">How it works</p>
+          <h2>CityPulse pulls recent Boston 311 records and groups them by neighborhood.</h2>
+        </div>
+        <p>
+          The website requests public JSON data from the Boston 311 Service Requests API, keeps
+          records that include both open and closed dates, calculates resolution hours for each
+          request, then averages those values by neighborhood.
+        </p>
+      </section>
+
+      <section class="section-grid action-section" id="action">
+        <div class="section-intro">
+          <p class="eyebrow">Civic action</p>
+          <h2>Use the numbers as evidence when reporting service gaps.</h2>
+          <p>
+            If your neighborhood shows slower resolution times, cite the average wait and ticket
+            count when contacting city leadership.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+          <article>
+            <h3>Boston City Council</h3>
+            <p>city.council@boston.gov</p>
+            <p>617-635-4400</p>
+          </article>
+          <article>
+            <h3>Mayor's Office of Neighborhood Services</h3>
+            <p>ons@boston.gov</p>
+            <p>617-635-3485</p>
+          </article>
+          <article>
+            <h3>Boston 311</h3>
+            <p>boston.gov/311</p>
+            <p>@Boston311</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Built from public Boston 311 service request data for neighborhood transparency.</p>
+      <a href="https://data.boston.gov/dataset/311-service-requests" target="_blank" rel="noreferrer">
+        View dataset
+      </a>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
 </html>

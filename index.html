@@ -4,13 +4,25 @@
   <title>CityPulse Boston</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <h1>CityPulse Boston 311 Dashboard</h1>
+  <div class="container">
+    <h1>CityPulse Boston</h1>
+    <p class="subtitle">311 response time inequality dashboard</p>
 
-  <p>Underserved neighborhoods based on response time analysis</p>
+    <div class="controls">
+      <label>Max Tickets Loaded: 10,000</label>
+    </div>
 
-  <div id="output"></div>
+    <div id="summary"></div>
 
+    <canvas id="chart" height="120"></canvas>
+
+    <h2>Neighborhood Rankings</h2>
+    <div id="output"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

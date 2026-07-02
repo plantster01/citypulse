@@ -1,1 +1,13 @@
+body {
+  font-family: Arial;
+  margin: 40px;
+}
 
+h1 {
+  color: #0056b3;
+}
+
+#output div {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}

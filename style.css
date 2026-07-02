@@ -1,62 +1,13 @@
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f6f7fb;
+  font-family: Arial;
+  margin: 40px;
 }
 
-header {
-  background: #0b3d91;
-  color: white;
-  padding: 20px;
+h1 {
+  color: #0056b3;
 }
 
-nav {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  background: white;
+#output div {
+  padding: 8px;
   border-bottom: 1px solid #ddd;
-}
-
-nav button {
-  padding: 8px 12px;
-  border: none;
-  cursor: pointer;
-  background: #e9eefc;
-  border-radius: 6px;
-}
-
-nav button:hover {
-  background: #d6e2ff;
-}
-
-.page {
-  display: none;
-  padding: 20px;
-}
-
-.active {
-  display: block;
-}
-
-.card {
-  background: white;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 8px;
-  border: 1px solid #e6e6e6;
-}
-
-#rankingList .card {
-  display: flex;
-  justify-content: space-between;
-}
-
-button {
-  margin: 10px 0;
-  cursor: pointer;
-}
-
-#slider {
-  width: 300px;
 }

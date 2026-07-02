@@ -1,13 +1,60 @@
 body {
-  font-family: Arial;
-  margin: 40px;
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+  margin: 0;
+  padding: 30px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
 }
 
 h1 {
   color: #0056b3;
+  margin-bottom: 5px;
 }
 
-#output div {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
+.subtitle {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+#summary {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7ef;
+}
+
+#output {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background: white;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7ef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rank {
+  font-weight: bold;
+  color: #0056b3;
+}
+
+.bad {
+  color: #d9534f;
+  font-weight: bold;
+}
+
+.good {
+  color: #28a745;
+  font-weight: bold;
 }

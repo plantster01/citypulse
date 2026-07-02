@@ -1,60 +1,62 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f4f6fb;
   margin: 0;
-  padding: 30px;
+  background: #f6f7fb;
 }
 
-.container {
-  max-width: 1000px;
-  margin: auto;
+header {
+  background: #0b3d91;
+  color: white;
+  padding: 20px;
 }
 
-h1 {
-  color: #0056b3;
-  margin-bottom: 5px;
-}
-
-.subtitle {
-  color: #666;
-  margin-bottom: 20px;
-}
-
-#summary {
-  background: white;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #e5e7ef;
-}
-
-#output {
+nav {
   display: flex;
-  flex-direction: column;
   gap: 10px;
+  padding: 10px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+nav button {
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  background: #e9eefc;
+  border-radius: 6px;
+}
+
+nav button:hover {
+  background: #d6e2ff;
+}
+
+.page {
+  display: none;
+  padding: 20px;
+}
+
+.active {
+  display: block;
 }
 
 .card {
   background: white;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid #e5e7ef;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+}
+
+#rankingList .card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
-.rank {
-  font-weight: bold;
-  color: #0056b3;
+button {
+  margin: 10px 0;
+  cursor: pointer;
 }
 
-.bad {
-  color: #d9534f;
-  font-weight: bold;
-}
-
-.good {
-  color: #28a745;
-  font-weight: bold;
+#slider {
+  width: 300px;
 }

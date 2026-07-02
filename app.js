@@ -1,7 +1,7 @@
 let requestList = [];
 
 async function loadData() {
-  const url = "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=5000";
+  const url = "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=10000";
 
   const res = await fetch(url);
   const data = await res.json();

@@ -1,9 +1,42 @@
 const API_URL =
-  "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=2500";
+  "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=10000";
+const RECORD_LIMIT = 10000;
+const MIN_TICKETS_PER_NEIGHBORHOOD = 25;
+
+const NEIGHBORHOOD_ALIASES = {
+  "allston / brighton": "Allston/Brighton",
+  "allston/brighton": "Allston/Brighton",
+  "allston": "Allston",
+  "back bay": "Back Bay",
+  "bay village": "Bay Village",
+  "beacon hill": "Beacon Hill",
+  "brighton": "Brighton",
+  "charlestown": "Charlestown",
+  "chinatown": "Chinatown",
+  "dorchester": "Dorchester",
+  "downtown": "Downtown",
+  "east boston": "East Boston",
+  "fenway": "Fenway",
+  "hyde park": "Hyde Park",
+  "jamaica plain": "Jamaica Plain",
+  "leather district": "Leather District",
+  "longwood": "Longwood",
+  "mattapan": "Mattapan",
+  "mission hill": "Mission Hill",
+  "north end": "North End",
+  "roslindale": "Roslindale",
+  "roxbury": "Roxbury",
+  "south boston": "South Boston",
+  "south boston waterfront": "South Boston Waterfront",
+  "south end": "South End",
+  "west end": "West End",
+  "west roxbury": "West Roxbury"
+};
 
 const state = {
   requests: [],
   neighborhoods: [],
+  excludedNeighborhoods: [],
   sortSlowestFirst: false,
   searchTerm: "",
   targetHours: 72
@@ -11,8 +44,10 @@ const state = {
 
 const els = {
   loadStatus: document.querySelector("#load-status"),
+  recordLimit: document.querySelector("#record-limit"),
   totalRequests: document.querySelector("#total-requests"),
   totalNeighborhoods: document.querySelector("#total-neighborhoods"),
+  reliableTickets: document.querySelector("#reliable-tickets"),
   cityAverage: document.querySelector("#city-average"),
   fastestArea: document.querySelector("#fastest-area"),
   rankingBody: document.querySelector("#ranking-body"),
@@ -24,6 +59,16 @@ const els = {
   simSummary: document.querySelector("#sim-summary"),
   simResults: document.querySelector("#sim-results")
 };
+
+function normalizeNeighborhood(value) {
+  if (!value) {
+    return "null";
+  }
+
+  const cleaned = String(value).replace(/\s+/g, " ").trim();
+  const key = cleaned.toLowerCase();
+  return NEIGHBORHOOD_ALIASES[key] || "null";
+}
 
 function getField(record, names) {
   for (const name of names) {
@@ -67,20 +112,24 @@ function buildNeighborhoodStats(requests) {
     entry.count += 1;
   });
 
-  return Array.from(grouped.values())
-    .filter((entry) => entry.count > 0)
-    .map((entry) => ({
+  const allNeighborhoods = Array.from(grouped.values()).map((entry) => ({
       neighborhood: entry.neighborhood,
       avgHours: roundTenths(entry.totalHours / entry.count),
       avgDays: roundTenths(entry.totalHours / entry.count / 24),
       count: entry.count
     }));
+
+  state.excludedNeighborhoods = allNeighborhoods
+    .filter((entry) => entry.count < MIN_TICKETS_PER_NEIGHBORHOOD)
+    .sort((a, b) => a.neighborhood.localeCompare(b.neighborhood));
+
+  return allNeighborhoods.filter((entry) => entry.count >= MIN_TICKETS_PER_NEIGHBORHOOD);
 }
 
 function parseRecords(records) {
   return records
     .map((record) => {
-      const neighborhood = getField(record, ["neighborhood"]);
+      const neighborhood = normalizeNeighborhood(getField(record, ["neighborhood"]));
       const openDate = getField(record, ["open_dt", "open_date"]);
       const closedDate = getField(record, ["closed_dt", "closed_date"]);
       const type = getField(record, ["type", "case_title", "reason"]);
@@ -115,7 +164,9 @@ function renderSnapshot() {
   const fastest = state.neighborhoods.slice().sort((a, b) => a.avgHours - b.avgHours)[0];
 
   els.totalRequests.textContent = state.requests.length.toLocaleString();
+  els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
   els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
+  els.reliableTickets.textContent = `${MIN_TICKETS_PER_NEIGHBORHOOD}+`;
   els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs`;
   els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
 }
@@ -164,7 +215,17 @@ function renderRawStats() {
         </article>
       `
     )
-    .join("");
+    .join("") +
+    state.excludedNeighborhoods
+      .map(
+        (entry) => `
+          <article class="stat-item muted-stat">
+            <span>${entry.neighborhood}</span>
+            <strong>Excluded: ${entry.count} tickets, below ${MIN_TICKETS_PER_NEIGHBORHOOD} minimum</strong>
+          </article>
+        `
+      )
+      .join("");
 }
 
 function renderSimulator() {
@@ -204,10 +265,27 @@ function renderSimulator() {
 }
 
 function renderAll() {
+  updateSliderBounds();
   renderSnapshot();
   renderRankings();
   renderRawStats();
   renderSimulator();
+}
+
+function updateSliderBounds() {
+  if (!state.neighborhoods.length) {
+    return;
+  }
+
+  const averages = state.neighborhoods.map((entry) => entry.avgHours);
+  const minHours = Math.floor(Math.min(...averages));
+  const maxHours = Math.ceil(Math.max(...averages));
+  const startingTarget = Math.min(Math.max(72, minHours), maxHours);
+
+  els.targetSlider.min = String(minHours);
+  els.targetSlider.max = String(maxHours);
+  els.targetSlider.value = String(startingTarget);
+  state.targetHours = startingTarget;
 }
 
 async function loadData() {
@@ -250,3 +328,4 @@ els.targetSlider.addEventListener("input", (event) => {
 });
 
 loadData();
+

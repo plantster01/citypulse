@@ -43,15 +43,19 @@ const state = {
 };
 
 const els = {
-  loadStatus: document.querySelector("#load-status"),
   recordLimit: document.querySelector("#record-limit"),
   totalRequests: document.querySelector("#total-requests"),
   totalNeighborhoods: document.querySelector("#total-neighborhoods"),
   reliableTickets: document.querySelector("#reliable-tickets"),
   cityAverage: document.querySelector("#city-average"),
   fastestArea: document.querySelector("#fastest-area"),
+  medianResponse: document.querySelector("#median-response"),
+  slowestArea: document.querySelector("#slowest-area"),
+  topRequestType: document.querySelector("#top-request-type"),
+  excludedCount: document.querySelector("#excluded-count"),
   rankingBody: document.querySelector("#ranking-body"),
   statsList: document.querySelector("#stats-list"),
+  typeList: document.querySelector("#type-list"),
   sortToggle: document.querySelector("#sort-toggle"),
   search: document.querySelector("#neighborhood-search"),
   targetSlider: document.querySelector("#target-slider"),
@@ -97,6 +101,19 @@ function roundTenths(value) {
 
 function formatTenths(value) {
   return Number(value).toFixed(1);
+}
+
+function getMedian(values) {
+  if (!values.length) {
+    return 0;
+  }
+
+  const sorted = values.slice().sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+  return sorted[middle];
 }
 
 function buildNeighborhoodStats(requests) {
@@ -162,6 +179,8 @@ function renderSnapshot() {
   const totalHours = state.requests.reduce((sum, request) => sum + request.hours, 0);
   const cityAvg = state.requests.length ? roundTenths(totalHours / state.requests.length) : 0;
   const fastest = state.neighborhoods.slice().sort((a, b) => a.avgHours - b.avgHours)[0];
+  const slowest = state.neighborhoods.slice().sort((a, b) => b.avgHours - a.avgHours)[0];
+  const medianHours = roundTenths(getMedian(state.requests.map((request) => request.hours)));
 
   els.totalRequests.textContent = state.requests.length.toLocaleString();
   els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
@@ -169,6 +188,9 @@ function renderSnapshot() {
   els.reliableTickets.textContent = `${MIN_TICKETS_PER_NEIGHBORHOOD}+`;
   els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs`;
   els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
+  els.medianResponse.textContent = `${formatTenths(medianHours)} hrs`;
+  els.slowestArea.textContent = slowest ? slowest.neighborhood : "--";
+  els.excludedCount.textContent = state.excludedNeighborhoods.length.toLocaleString();
 }
 
 function renderRankings() {
@@ -228,6 +250,45 @@ function renderRawStats() {
       .join("");
 }
 
+function renderRequestTypes() {
+  const counts = new Map();
+
+  state.requests.forEach((request) => {
+    const type = request.type && request.type !== "null" ? request.type : "Unknown";
+    counts.set(type, (counts.get(type) || 0) + 1);
+  });
+
+  const topTypes = Array.from(counts.entries())
+    .map(([type, count]) => ({ type, count }))
+    .sort((a, b) => b.count - a.count || a.type.localeCompare(b.type))
+    .slice(0, 6);
+
+  els.topRequestType.textContent = topTypes[0] ? topTypes[0].type : "--";
+
+  if (!topTypes.length) {
+    els.typeList.innerHTML = `<p>No request types available.</p>`;
+    return;
+  }
+
+  const maxCount = topTypes[0].count;
+  els.typeList.innerHTML = topTypes
+    .map((entry) => {
+      const width = Math.max(8, Math.round((entry.count / maxCount) * 100));
+      return `
+        <article class="type-item">
+          <div>
+            <strong>${entry.type}</strong>
+            <span>${entry.count.toLocaleString()} tickets</span>
+          </div>
+          <div class="type-bar" aria-hidden="true">
+            <span style="width: ${width}%"></span>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
 function renderSimulator() {
   const targetDays = roundTenths(state.targetHours / 24);
   const passing = state.neighborhoods.filter((entry) => entry.avgHours <= state.targetHours);
@@ -269,6 +330,7 @@ function renderAll() {
   renderSnapshot();
   renderRankings();
   renderRawStats();
+  renderRequestTypes();
   renderSimulator();
 }
 
@@ -299,12 +361,11 @@ async function loadData() {
     const records = data?.result?.records || [];
     state.requests = parseRecords(records);
     state.neighborhoods = buildNeighborhoodStats(state.requests);
-    els.loadStatus.textContent = `Loaded ${state.requests.length.toLocaleString()} valid records`;
     renderAll();
   } catch (error) {
-    els.loadStatus.textContent = "Live data unavailable";
     els.rankingBody.innerHTML = `<tr><td colspan="5">Could not load Boston 311 data. Try refreshing the page later.</td></tr>`;
     els.statsList.innerHTML = `<p>Could not load neighborhood statistics.</p>`;
+    els.typeList.innerHTML = `<p>Could not load request types.</p>`;
     els.simSummary.textContent = "Simulator unavailable until data loads.";
     console.error(error);
   }
@@ -328,4 +389,5 @@ els.targetSlider.addEventListener("input", (event) => {
 });
 
 loadData();
+
 

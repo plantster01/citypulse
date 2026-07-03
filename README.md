@@ -46,7 +46,3 @@ Planned directions include:
 - Trend detection over time
 - More transparent reliability notes for sample sizes
 - Expansion to other cities with open 311-style datasets
-
-## Founder
-
-Founded by Aarin Mugundu.

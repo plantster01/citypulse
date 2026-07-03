@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CityPulse Boston</title>
+    <title>CityPulse 311 Dashboard</title>
     <meta
       name="description"
-      content="CityPulse turns Boston 311 service request data into neighborhood response-time rankings, equity stats, and target simulations."
+      content="CityPulse turns public 311 service request data into area-level response-time rankings, equity stats, and target simulations."
     >
-    <link rel="stylesheet" href="./styles.css?v=24">
+    <link rel="stylesheet" href="./styles.css?v=33">
   </head>
   <body>
     <div class="cursor-glow" aria-hidden="true"></div>
@@ -33,13 +33,13 @@
           <p class="eyebrow">Early civic data platform</p>
           <h1>CityPulse makes service equity visible.</h1>
           <p>
-            CityPulse turns public 311 records into neighborhood-level accountability metrics, so
-            residents can see where city services are fast, delayed, or uneven. 
+            CityPulse turns public 311 records into area-level accountability metrics, so
+            residents can see where city services are fast, delayed, or uneven.
           </p>
           <div class="hero-explainer" aria-label="How CityPulse works">
             <article>
               <span>1</span>
-              <p>Pulls recent closed Boston 311 service requests.</p>
+              <p>Pulls recent closed 311 service requests from the selected city.</p>
             </article>
             <article>
               <span>2</span>
@@ -57,13 +57,22 @@
         </div>
 
         <aside class="status-panel" aria-label="Current data status">
+          <div class="status-row city-row">
+            <label for="city-select">Select city</label>
+            <select id="city-select">
+              <option value="boston">Boston</option>
+              <option value="nyc">New York City</option>
+              <option value="sf">San Francisco</option>
+              <option value="la">Los Angeles</option>
+            </select>
+          </div>
           <div class="status-row">
-            <span>Current pilot</span>
-            <strong>Analyze Boston</strong>
+            <span>Data source</span>
+            <strong id="data-source">Analyze Boston</strong>
           </div>
           <div class="status-row">
             <span>Records requested</span>
-            <strong id="record-limit">10,000</strong>
+            <strong id="record-limit">25,000</strong>
           </div>
         </aside>
       </section>
@@ -72,7 +81,7 @@
     <main>
       <section class="metric-band" aria-label="Citywide snapshot">
         <article>
-          <span class="metric-label">Neighborhoods</span>
+          <span class="metric-label">Service areas</span>
           <strong id="total-neighborhoods">--</strong>
         </article>
         <article>
@@ -94,19 +103,19 @@
       <section class="section-grid" id="rankings">
         <div class="section-intro">
           <p class="eyebrow">Live pilot</p>
-          <h2>Compare neighborhood service response times.</h2>
+          <h2>Compare service response times across the city.</h2>
           <p>
-            Rankings use a larger live sample of recent closed requests. CityPulse only includes
-            neighborhoods with at least 25 valid tickets, so tiny sample sizes do not distort the
-            averages.
+            Rankings use a larger live sample of closed requests. CityPulse filters out extreme
+            long-running outliers and only includes areas with enough tickets to make the averages
+            useful.
           </p>
         </div>
 
         <div class="tool-surface">
           <div class="control-row">
             <label class="search-field">
-              <span>Filter neighborhoods</span>
-              <input id="neighborhood-search" type="search" placeholder="Type a neighborhood">
+              <span>Filter areas</span>
+              <input id="neighborhood-search" type="search" placeholder="Type an area">
             </label>
             <button class="icon-button" id="sort-toggle" type="button" aria-pressed="false">
               Slowest first
@@ -118,7 +127,7 @@
               <thead>
                 <tr>
                   <th scope="col">Rank</th>
-                  <th scope="col">Neighborhood</th>
+                  <th scope="col">Area</th>
                   <th scope="col">Avg hours</th>
                   <th scope="col">Avg days</th>
                   <th scope="col">Tickets</th>
@@ -156,8 +165,8 @@
           <p class="eyebrow">Policy simulator</p>
           <h2>Set a service goal and see who meets it.</h2>
           <p>
-            Choose a target response time and CityPulse will show which neighborhoods are meeting
-            that standard based on recent Boston 311 request data.
+            Choose a target response time and CityPulse will show which areas are meeting
+            that standard based on recent 311 request data.
           </p>
         </div>
 
@@ -174,17 +183,17 @@
 
       <section class="section-grid" id="raw-stats">
         <div class="section-intro">
-          <p class="eyebrow">Neighborhood detail</p>
+          <p class="eyebrow">Area detail</p>
           <h2>Check the underlying averages.</h2>
           <p>
-            Review each neighborhood’s average response time alongside its ticket count. Areas
+            Review each area’s average response time alongside its ticket count. Areas
             with too few valid records are marked separately so the public rankings stay fair and
             reliable.
           </p>
         </div>
 
         <div class="stat-list" id="stats-list">
-          <p>Loading neighborhood statistics...</p>
+          <p>Loading area statistics...</p>
         </div>
       </section>
 
@@ -194,10 +203,9 @@
           <h2>CityPulse keeps the ranking simple and transparent.</h2>
         </div>
         <p>
-          The website requests up to 10,000 public JSON records from the Boston 311 Service
-          Requests API, keeps records that include accurate Boston neighborhood names plus both
-          open and closed dates, calculates resolution hours for each request, then averages those
-          values by neighborhood.
+          The website requests up to 25,000 public JSON records from the selected city’s 311 data
+          source, keeps records with area names plus open and closed dates, uses a 30-day outlier
+          guard for unusually long-running cases, then averages resolution time by area.
         </p>
       </section>
 
@@ -206,26 +214,23 @@
           <p class="eyebrow">Civic action</p>
           <h2>Use the numbers as evidence when reporting service gaps.</h2>
           <p>
-            If your neighborhood shows slower resolution times, cite the average wait and ticket
-            count when contacting city leadership.
+            If your area shows slower resolution times, cite the average wait and ticket
+            count when contacting local leadership or filing a follow-up request.
           </p>
         </div>
 
-        <div class="contact-grid">
+        <div class="contact-grid" id="contact-grid">
           <article>
-            <h3>Boston City Council</h3>
-            <p>city.council@boston.gov</p>
-            <p>617-635-4400</p>
+            <h3>City 311 portal</h3>
+            <p>File or follow up through the city’s official 311 service.</p>
           </article>
           <article>
-            <h3>Mayor's Office of Neighborhood Services</h3>
-            <p>ons@boston.gov</p>
-            <p>617-635-3485</p>
+            <h3>Local representatives</h3>
+            <p>Share the area average, ticket count, and comparison to citywide response time.</p>
           </article>
           <article>
-            <h3>Boston 311</h3>
-            <p>boston.gov/311</p>
-            <p>@Boston311</p>
+            <h3>Community groups</h3>
+            <p>Use CityPulse rankings to support neighborhood meetings or public testimony.</p>
           </article>
         </div>
       </section>
@@ -233,12 +238,10 @@
 
     <footer>
       <p>Founded by Aarin Mugundu.</p>
-      <a href="https://data.boston.gov/dataset/311-service-requests" target="_blank" rel="noreferrer">
-        View dataset
-      </a>
+      <a href="#about">View data notes</a>
     </footer>
 
-    <script src="./effects.js?v=24"></script>
-    <script src="./app.js?v=24"></script>
+    <script src="./effects.js?v=33"></script>
+    <script src="./app.js?v=33"></script>
   </body>
 </html>

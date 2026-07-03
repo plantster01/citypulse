@@ -47,7 +47,7 @@ const els = {
   totalNeighborhoods: document.querySelector("#total-neighborhoods"),
   cityAverage: document.querySelector("#city-average"),
   fastestArea: document.querySelector("#fastest-area"),
-  medianResponse: document.querySelector("#median-response"),
+  busiestArea: document.querySelector("#busiest-area"),
   slowestArea: document.querySelector("#slowest-area"),
   topRequestType: document.querySelector("#top-request-type"),
   rankingBody: document.querySelector("#ranking-body"),
@@ -98,19 +98,6 @@ function roundTenths(value) {
 
 function formatTenths(value) {
   return Number(value).toFixed(1);
-}
-
-function getMedian(values) {
-  if (!values.length) {
-    return 0;
-  }
-
-  const sorted = values.slice().sort((a, b) => a - b);
-  const middle = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 0) {
-    return (sorted[middle - 1] + sorted[middle]) / 2;
-  }
-  return sorted[middle];
 }
 
 function buildNeighborhoodStats(requests) {
@@ -177,13 +164,13 @@ function renderSnapshot() {
   const cityAvg = state.requests.length ? roundTenths(totalHours / state.requests.length) : 0;
   const fastest = state.neighborhoods.slice().sort((a, b) => a.avgHours - b.avgHours)[0];
   const slowest = state.neighborhoods.slice().sort((a, b) => b.avgHours - a.avgHours)[0];
-  const medianHours = roundTenths(getMedian(state.requests.map((request) => request.hours)));
+  const busiest = state.neighborhoods.slice().sort((a, b) => b.count - a.count)[0];
 
   els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
   els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
   els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs / ${formatTenths(cityAvg / 24)} days`;
   els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
-  els.medianResponse.textContent = `${formatTenths(medianHours)} hrs`;
+  els.busiestArea.textContent = busiest ? busiest.neighborhood : "--";
   els.slowestArea.textContent = slowest ? slowest.neighborhood : "--";
 }
 

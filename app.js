@@ -44,15 +44,12 @@ const state = {
 
 const els = {
   recordLimit: document.querySelector("#record-limit"),
-  totalRequests: document.querySelector("#total-requests"),
   totalNeighborhoods: document.querySelector("#total-neighborhoods"),
-  reliableTickets: document.querySelector("#reliable-tickets"),
   cityAverage: document.querySelector("#city-average"),
   fastestArea: document.querySelector("#fastest-area"),
   medianResponse: document.querySelector("#median-response"),
   slowestArea: document.querySelector("#slowest-area"),
   topRequestType: document.querySelector("#top-request-type"),
-  excludedCount: document.querySelector("#excluded-count"),
   rankingBody: document.querySelector("#ranking-body"),
   statsList: document.querySelector("#stats-list"),
   typeList: document.querySelector("#type-list"),
@@ -182,15 +179,12 @@ function renderSnapshot() {
   const slowest = state.neighborhoods.slice().sort((a, b) => b.avgHours - a.avgHours)[0];
   const medianHours = roundTenths(getMedian(state.requests.map((request) => request.hours)));
 
-  els.totalRequests.textContent = state.requests.length.toLocaleString();
   els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
   els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
-  els.reliableTickets.textContent = `${MIN_TICKETS_PER_NEIGHBORHOOD}+`;
-  els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs`;
+  els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs / ${formatTenths(cityAvg / 24)} days`;
   els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
   els.medianResponse.textContent = `${formatTenths(medianHours)} hrs`;
   els.slowestArea.textContent = slowest ? slowest.neighborhood : "--";
-  els.excludedCount.textContent = state.excludedNeighborhoods.length.toLocaleString();
 }
 
 function renderRankings() {
@@ -215,7 +209,7 @@ function renderRankings() {
       return `
         <tr class="${className}">
           <td>${index + 1}</td>
-          <td><strong>${entry.neighborhood}</strong></td>
+          <td class="neighborhood-name">${entry.neighborhood}</td>
           <td>${formatTenths(entry.avgHours)}</td>
           <td>${formatTenths(entry.avgDays)}</td>
           <td>${entry.count}</td>
@@ -233,7 +227,7 @@ function renderRawStats() {
       (entry) => `
         <article class="stat-item">
           <span>${entry.neighborhood}</span>
-          <strong>${entry.count} issues | ${formatTenths(entry.avgDays)} days (${formatTenths(entry.avgHours)} hours)</strong>
+          <span>${entry.count} issues | ${formatTenths(entry.avgDays)} days (${formatTenths(entry.avgHours)} hours)</span>
         </article>
       `
     )
@@ -243,7 +237,7 @@ function renderRawStats() {
         (entry) => `
           <article class="stat-item muted-stat">
             <span>${entry.neighborhood}</span>
-            <strong>Excluded: ${entry.count} tickets, below ${MIN_TICKETS_PER_NEIGHBORHOOD} minimum</strong>
+            <span>Excluded: ${entry.count} tickets, below ${MIN_TICKETS_PER_NEIGHBORHOOD} minimum</span>
           </article>
         `
       )
@@ -313,11 +307,12 @@ function renderSimulator() {
     .map((entry) => {
       const didPass = entry.avgHours <= state.targetHours;
       const overBy = roundTenths(entry.avgHours - state.targetHours);
+      const overByDays = roundTenths(overBy / 24);
       return `
         <article class="result-item ${didPass ? "pass" : "fail"}">
-          <strong>${didPass ? "Yes" : "No"}: ${entry.neighborhood}</strong>
+          <span>${didPass ? "Yes" : "No"}: ${entry.neighborhood}</span>
           <span>
-            ${formatTenths(entry.avgHours)} hrs avg${didPass ? "" : `, over by ${formatTenths(overBy)} hrs`}
+            ${formatTenths(entry.avgHours)} hrs / ${formatTenths(entry.avgDays)} days avg${didPass ? "" : `, over by ${formatTenths(overBy)} hrs / ${formatTenths(overByDays)} days`}
           </span>
         </article>
       `;

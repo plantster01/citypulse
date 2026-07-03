@@ -320,6 +320,45 @@ h3 {
   font-size: 1.1rem;
 }
 
+.hero-explainer {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 760px;
+}
+
+.hero-explainer article {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(12px);
+  padding: 13px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.hero-explainer span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(219, 249, 255, 0.18);
+  color: #dbf9ff;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.hero-explainer p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1424,6 +1463,7 @@ footer a:active {
   }
 
   .hero-actions,
+  .hero-explainer,
   .control-row,
   .slider-header,
   footer,
@@ -1440,6 +1480,10 @@ footer a:active {
 
   .metric-band {
     margin-top: 24px;
+  }
+
+  .hero-explainer {
+    grid-template-columns: 1fr;
   }
 
   .contact-grid p {

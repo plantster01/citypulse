@@ -8,7 +8,7 @@
       name="description"
       content="CityPulse turns Boston 311 service request data into neighborhood response-time rankings, equity stats, and target simulations."
     >
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./styles.css?v=3">
   </head>
   <body>
     <header class="app-header">
@@ -45,7 +45,11 @@
           </div>
           <div class="status-row">
             <span>Records requested</span>
-            <strong id="record-limit">2,500</strong>
+            <strong id="record-limit">10,000</strong>
+          </div>
+          <div class="status-row">
+            <span>Reliability rule</span>
+            <strong>25+ tickets</strong>
           </div>
           <div class="status-row">
             <span>Dashboard status</span>
@@ -66,6 +70,10 @@
           <strong id="total-neighborhoods">--</strong>
         </article>
         <article>
+          <span class="metric-label">Min tickets</span>
+          <strong id="reliable-tickets">--</strong>
+        </article>
+        <article>
           <span class="metric-label">Citywide average</span>
           <strong id="city-average">--</strong>
         </article>
@@ -80,8 +88,9 @@
           <p class="eyebrow">Neighborhood equity rankings</p>
           <h2>Compare average 311 resolution time by neighborhood.</h2>
           <p>
-            Rankings are based on closed service requests with valid open and closed timestamps.
-            Lower average hours means faster resolution.
+            Rankings use a larger live sample of recent closed requests. CityPulse only includes
+            neighborhoods with at least 25 valid tickets, so tiny sample sizes do not distort the
+            averages.
           </p>
         </div>
 
@@ -122,8 +131,9 @@
           <p class="eyebrow">Target simulator</p>
           <h2>Set a response goal and see who meets it.</h2>
           <p>
-            Use the slider to test a resolution-time target from half a day to one week. CityPulse
-            compares each neighborhood average against the selected goal.
+            The slider starts at the fastest reliable neighborhood average and ends at the slowest
+            reliable neighborhood average. At the maximum value, every ranked neighborhood meets
+            the target.
           </p>
         </div>
 
@@ -143,8 +153,9 @@
           <p class="eyebrow">Raw neighborhood stats</p>
           <h2>Scan the underlying averages.</h2>
           <p>
-            This section mirrors your original Java project’s neighborhood-by-neighborhood summary
-            and keeps the ticket counts visible so the results are easier to judge.
+            This section mirrors your original Java project’s neighborhood-by-neighborhood summary,
+            keeps ticket counts visible, and marks any neighborhood excluded for having too few
+            valid tickets.
           </p>
         </div>
 
@@ -159,9 +170,10 @@
           <h2>CityPulse pulls recent Boston 311 records and groups them by neighborhood.</h2>
         </div>
         <p>
-          The website requests public JSON data from the Boston 311 Service Requests API, keeps
-          records that include both open and closed dates, calculates resolution hours for each
-          request, then averages those values by neighborhood.
+          The website requests up to 10,000 public JSON records from the Boston 311 Service
+          Requests API, keeps records that include accurate Boston neighborhood names plus both
+          open and closed dates, calculates resolution hours for each request, then averages those
+          values by neighborhood.
         </p>
       </section>
 
@@ -196,12 +208,12 @@
     </main>
 
     <footer>
-      <p>Built from public Boston 311 service request data for neighborhood transparency.</p>
+      <p>Team CityPulse. Founded by Aarin Mugundu, LHS'27.</p>
       <a href="https://data.boston.gov/dataset/311-service-requests" target="_blank" rel="noreferrer">
         View dataset
       </a>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="./app.js?v=3"></script>
   </body>
 </html>

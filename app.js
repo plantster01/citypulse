@@ -389,5 +389,3 @@ els.targetSlider.addEventListener("input", (event) => {
 });
 
 loadData();
-
-

@@ -47,8 +47,6 @@ const els = {
   totalNeighborhoods: document.querySelector("#total-neighborhoods"),
   cityAverage: document.querySelector("#city-average"),
   fastestArea: document.querySelector("#fastest-area"),
-  slowestArea: document.querySelector("#slowest-area"),
-  topRequestType: document.querySelector("#top-request-type"),
   rankingBody: document.querySelector("#ranking-body"),
   statsList: document.querySelector("#stats-list"),
   typeList: document.querySelector("#type-list"),
@@ -162,13 +160,11 @@ function renderSnapshot() {
   const totalHours = state.requests.reduce((sum, request) => sum + request.hours, 0);
   const cityAvg = state.requests.length ? roundTenths(totalHours / state.requests.length) : 0;
   const fastest = state.neighborhoods.slice().sort((a, b) => a.avgHours - b.avgHours)[0];
-  const slowest = state.neighborhoods.slice().sort((a, b) => b.avgHours - a.avgHours)[0];
 
   els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
   els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
   els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs / ${formatTenths(cityAvg / 24)} days`;
   els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
-  els.slowestArea.textContent = slowest ? slowest.neighborhood : "--";
 }
 
 function renderRankings() {
@@ -240,8 +236,6 @@ function renderRequestTypes() {
     .map(([type, count]) => ({ type, count }))
     .sort((a, b) => b.count - a.count || a.type.localeCompare(b.type))
     .slice(0, 6);
-
-  els.topRequestType.textContent = topTypes[0] ? topTypes[0].type : "--";
 
   if (!topTypes.length) {
     els.typeList.innerHTML = `<p>No request types available.</p>`;

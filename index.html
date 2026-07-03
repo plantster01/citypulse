@@ -8,7 +8,7 @@
       name="description"
       content="CityPulse turns Boston 311 service request data into neighborhood response-time rankings, equity stats, and target simulations."
     >
-    <link rel="stylesheet" href="./styles.css?v=3">
+    <link rel="stylesheet" href="./styles.css?v=4">
   </head>
   <body>
     <header class="app-header">
@@ -51,10 +51,6 @@
             <span>Reliability rule</span>
             <strong>25+ tickets</strong>
           </div>
-          <div class="status-row">
-            <span>Dashboard status</span>
-            <strong id="load-status">Loading live data</strong>
-          </div>
         </aside>
       </section>
     </header>
@@ -80,6 +76,25 @@
         <article>
           <span class="metric-label">Fastest area</span>
           <strong id="fastest-area">--</strong>
+        </article>
+      </section>
+
+      <section class="insight-strip" aria-label="Citywide insights">
+        <article>
+          <span class="metric-label">Median response</span>
+          <strong id="median-response">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Slowest area</span>
+          <strong id="slowest-area">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Top request type</span>
+          <strong id="top-request-type">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Excluded low-sample areas</span>
+          <strong id="excluded-count">--</strong>
         </article>
       </section>
 
@@ -122,6 +137,23 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-grid compact-section" id="request-types">
+        <div class="section-intro">
+          <p class="eyebrow">Request mix</p>
+          <h2>See which service types appear most often.</h2>
+          <p>
+            The request mix adds context to the rankings by showing what kinds of 311 cases are
+            most common in the current sample.
+          </p>
+        </div>
+
+        <div class="tool-surface">
+          <div class="type-list" id="type-list">
+            <p>Loading request types...</p>
           </div>
         </div>
       </section>
@@ -208,12 +240,13 @@
     </main>
 
     <footer>
-      <p>Team CityPulse. Founded by Aarin Mugundu, LHS'27.</p>
+      <p>Founded by Aarin Mugundu, LHS '27.</p>
       <a href="https://data.boston.gov/dataset/311-service-requests" target="_blank" rel="noreferrer">
         View dataset
       </a>
     </footer>
 
-    <script src="./app.js?v=3"></script>
+    <script src="./app.js?v=4"></script>
   </body>
 </html>
+

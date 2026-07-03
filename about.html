@@ -8,15 +8,15 @@
       name="description"
       content="About CityPulse, a civic data platform for public-service accountability."
     >
-    <link rel="stylesheet" href="./styles.css?v=5">
+    <link rel="stylesheet" href="./styles.css?v=19">
   </head>
   <body>
+    <div class="cursor-glow" aria-hidden="true"></div>
     <header class="page-header">
       <nav class="topbar" aria-label="Primary">
         <a class="brand" href="./index.html" aria-label="CityPulse home">
           <span class="brand-mark" aria-hidden="true">
             <span class="logo-buildings"></span>
-            <span class="logo-heart"></span>
           </span>
           <span>CityPulse</span>
         </a>
@@ -30,10 +30,10 @@
 
       <section class="page-hero">
         <p class="eyebrow">About</p>
-        <h1>Public-service data should be understandable.</h1>
+        <h1>Public-service performance should be visible.</h1>
         <p>
-          CityPulse turns public 311 service records into neighborhood-level signals that residents,
-          advocates, journalists, and city leaders can actually use.
+          CityPulse is building a simple civic accountability layer on top of public 311 records,
+          starting with Boston.
         </p>
       </section>
     </header>
@@ -42,38 +42,39 @@
       <section class="split-section">
         <div>
           <p class="eyebrow">Problem</p>
-          <h2>City service records are public, but not always useful.</h2>
+          <h2>Open data exists. Public accountability is still hard.</h2>
         </div>
         <p>
           Boston publishes thousands of 311 records, but raw tables make it hard to see which
           neighborhoods wait longer, which request types dominate workload, and where data is too
-          thin to judge fairly. CityPulse translates that raw information into clear public metrics.
+          thin to judge fairly. CityPulse turns that information into metrics residents can read,
+          compare, and use.
         </p>
       </section>
 
       <section class="feature-grid">
         <article>
           <span class="metric-label">Residents</span>
-          <h3>Know what is happening nearby.</h3>
+          <h3>See neighborhood service quality.</h3>
           <p>Compare response times and use evidence when asking for faster service.</p>
         </article>
         <article>
           <span class="metric-label">Advocates</span>
-          <h3>Find service gaps faster.</h3>
+          <h3>Find evidence-backed service gaps.</h3>
           <p>Identify neighborhoods or request categories that may need public attention.</p>
         </article>
         <article>
           <span class="metric-label">Officials</span>
-          <h3>Spot operational pressure.</h3>
+          <h3>Spot operational pressure points.</h3>
           <p>Use response patterns to understand where resources may need to shift.</p>
         </article>
       </section>
     </main>
 
     <footer>
-      <p>Founded by Aarin Mugundu, LHS '27.</p>
+      <p>Founded by Aarin Mugundu.</p>
       <a href="./index.html">Open dashboard</a>
     </footer>
+    <script src="./effects.js?v=19"></script>
   </body>
 </html>
-

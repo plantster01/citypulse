@@ -36,7 +36,7 @@ a {
 }
 
 .app-header {
-  min-height: 92vh;
+  min-height: 72vh;
   background:
     linear-gradient(rgba(5, 21, 38, 0.44), rgba(5, 21, 38, 0.66)),
     url("https://images.unsplash.com/photo-1564595039985-8766d03c6d5d?auto=format&fit=crop&w=1800&q=80");
@@ -89,7 +89,7 @@ a {
 .hero {
   width: min(1160px, calc(100% - 32px));
   margin: auto;
-  padding: 72px 0 96px;
+  padding: 58px 0 72px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 56px;
@@ -218,21 +218,25 @@ main {
 
 .metric-band {
   width: min(1160px, calc(100% - 32px));
-  margin: -48px auto 0;
+  margin: 24px auto 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 12px;
   position: relative;
   z-index: 2;
+  align-items: stretch;
 }
 
 .metric-band article {
   background: white;
   border: 1px solid var(--line);
   border-radius: 8px;
-  min-height: 118px;
-  padding: 20px;
+  min-height: 104px;
+  padding: 18px;
   box-shadow: 0 12px 28px rgba(23, 32, 42, 0.09);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .metric-label {
@@ -246,8 +250,8 @@ main {
 
 .metric-band strong {
   display: block;
-  margin-top: 10px;
-  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  margin-top: 12px;
+  font-size: clamp(1.25rem, 2.1vw, 1.82rem);
   line-height: 1.08;
 }
 
@@ -425,6 +429,15 @@ input[type="range"] {
 
 .stat-item strong {
   color: var(--blue-dark);
+}
+
+.muted-stat {
+  background: #f6f8fa;
+  color: var(--muted);
+}
+
+.muted-stat strong {
+  color: var(--muted);
 }
 
 .info-band {

@@ -1,9 +1,8 @@
-const API_URL =
-  "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=10000";
-const RECORD_LIMIT = 10000;
-const MIN_TICKETS_PER_NEIGHBORHOOD = 25;
+const RECORD_LIMIT = 25000;
+const MIN_TICKETS_PER_AREA = 25;
+const MAX_RESOLUTION_HOURS = 24 * 30;
 
-const NEIGHBORHOOD_ALIASES = {
+const BOSTON_AREA_ALIASES = {
   "allston / brighton": "Allston/Brighton",
   "allston/brighton": "Allston/Brighton",
   "allston": "Allston",
@@ -33,7 +32,140 @@ const NEIGHBORHOOD_ALIASES = {
   "west roxbury": "West Roxbury"
 };
 
+const NYC_AREA_ALIASES = {
+  "bronx": "Bronx",
+  "brooklyn": "Brooklyn",
+  "manhattan": "Manhattan",
+  "queens": "Queens",
+  "staten island": "Staten Island"
+};
+
+const SF_AREA_ALIASES = {};
+const LA_AREA_ALIASES = {};
+
+const CITY_CONFIGS = {
+  boston: {
+    name: "Boston",
+    source: "Analyze Boston",
+    apiUrl:
+      "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=25000",
+    responseType: "ckan",
+    areaAliases: BOSTON_AREA_ALIASES,
+    areaFields: ["neighborhood"],
+    openFields: ["open_dt", "open_date"],
+    closedFields: ["closed_dt", "closed_date"],
+    typeFields: ["type", "case_title", "reason"],
+    contacts: [
+      {
+        title: "Boston 311",
+        lines: ["boston.gov/311", "@Boston311"]
+      },
+      {
+        title: "Boston City Council",
+        lines: ["city.council@boston.gov", "617-635-4400"]
+      },
+      {
+        title: "Mayor's Office of Neighborhood Services",
+        lines: ["ons@boston.gov", "617-635-3485"]
+      }
+    ]
+  },
+  nyc: {
+    name: "New York City",
+    source: "NYC Open Data",
+    apiUrl:
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?$limit=25000&$select=created_date,closed_date,complaint_type,borough&$where=closed_date%20IS%20NOT%20NULL%20AND%20borough%20IS%20NOT%20NULL&$order=closed_date%20DESC",
+    responseType: "socrata",
+    areaAliases: NYC_AREA_ALIASES,
+    areaFields: ["borough"],
+    openFields: ["created_date"],
+    closedFields: ["closed_date"],
+    typeFields: ["complaint_type"],
+    contacts: [
+      {
+        title: "NYC 311",
+        lines: ["portal.311.nyc.gov", "Call 311 in NYC"]
+      },
+      {
+        title: "NYC Council",
+        lines: ["council.nyc.gov", "Share borough-level evidence with your council member."]
+      },
+      {
+        title: "Mayor's Community Affairs Unit",
+        lines: ["nyc.gov/cau", "Use response data when raising service gaps."]
+      }
+    ]
+  },
+  sf: {
+    name: "San Francisco",
+    source: "DataSF",
+    apiUrl:
+      "https://data.sfgov.org/resource/vw6y-z8j6.json?$limit=25000&$select=requested_datetime,updated_datetime,service_name,neighborhoods_sffind_boundaries,status_description&$where=updated_datetime%20IS%20NOT%20NULL%20AND%20neighborhoods_sffind_boundaries%20IS%20NOT%20NULL%20AND%20status_description%3D%27Closed%27&$order=updated_datetime%20DESC",
+    responseType: "socrata",
+    areaAliases: SF_AREA_ALIASES,
+    allowUnmappedAreas: true,
+    areaFields: ["neighborhoods_sffind_boundaries"],
+    openFields: ["requested_datetime"],
+    closedFields: ["updated_datetime"],
+    typeFields: ["service_name"],
+    contacts: [
+      {
+        title: "SF 311",
+        lines: ["sf.gov/311", "Call 311 in San Francisco"]
+      },
+      {
+        title: "San Francisco Board of Supervisors",
+        lines: ["sfbos.org", "Share neighborhood-level evidence with your supervisor."]
+      },
+      {
+        title: "Mayor's Office of Neighborhood Services",
+        lines: ["sf.gov", "Use response data when raising service gaps."]
+      }
+    ]
+  },
+  la: {
+    name: "Los Angeles",
+    source: "LA Open Data",
+    apiUrl:
+      "https://data.lacity.org/resource/pvft-t768.json?$limit=25000",
+    responseType: "socrata",
+    areaAliases: LA_AREA_ALIASES,
+    allowUnmappedAreas: true,
+    numericAreaPrefix: "Council District",
+    areaFields: [
+      "nc_name",
+      "neighborhood_council_name",
+      "neighborhoodcouncilname",
+      "neighborhood_council",
+      "community",
+      "community_name",
+      "nc",
+      "council_district",
+      "councildistrict",
+      "cd"
+    ],
+    openFields: ["createddate", "created_date", "created_dt", "open_date"],
+    closedFields: ["closeddate", "closed_date", "updateddate", "updated_date"],
+    typeFields: ["requesttype", "request_type", "srtype", "service_name"],
+    contacts: [
+      {
+        title: "LA 311",
+        lines: ["lacity.gov/myla311", "Call 311 in Los Angeles"]
+      },
+      {
+        title: "Los Angeles City Council",
+        lines: ["council.lacity.gov", "Share neighborhood-level evidence with your council district."]
+      },
+      {
+        title: "Mayor's Help Desk",
+        lines: ["mayor.lacity.gov", "Use response data when raising service gaps."]
+      }
+    ]
+  }
+};
+
 const state = {
+  cityKey: "boston",
   requests: [],
   neighborhoods: [],
   excludedNeighborhoods: [],
@@ -43,6 +175,8 @@ const state = {
 };
 
 const els = {
+  citySelect: document.querySelector("#city-select"),
+  dataSource: document.querySelector("#data-source"),
   recordLimit: document.querySelector("#record-limit"),
   totalNeighborhoods: document.querySelector("#total-neighborhoods"),
   cityAverage: document.querySelector("#city-average"),
@@ -50,6 +184,7 @@ const els = {
   rankingBody: document.querySelector("#ranking-body"),
   statsList: document.querySelector("#stats-list"),
   typeList: document.querySelector("#type-list"),
+  contactGrid: document.querySelector("#contact-grid"),
   sortToggle: document.querySelector("#sort-toggle"),
   search: document.querySelector("#neighborhood-search"),
   targetSlider: document.querySelector("#target-slider"),
@@ -58,14 +193,21 @@ const els = {
   simResults: document.querySelector("#sim-results")
 };
 
-function normalizeNeighborhood(value) {
+function currentCity() {
+  return CITY_CONFIGS[state.cityKey];
+}
+
+function normalizeArea(value, city) {
   if (!value) {
     return "null";
   }
 
   const cleaned = String(value).replace(/\s+/g, " ").trim();
   const key = cleaned.toLowerCase();
-  return NEIGHBORHOOD_ALIASES[key] || "null";
+  if (city.numericAreaPrefix && /^\d+$/.test(cleaned)) {
+    return `${city.numericAreaPrefix} ${Number(cleaned)}`;
+  }
+  return city.areaAliases[key] || (city.allowUnmappedAreas ? cleaned : "null");
 }
 
 function getField(record, names) {
@@ -97,6 +239,13 @@ function formatTenths(value) {
   return Number(value).toFixed(1);
 }
 
+function extractRecords(data, city) {
+  if (city.responseType === "ckan") {
+    return data?.result?.records || [];
+  }
+  return Array.isArray(data) ? data : [];
+}
+
 function buildNeighborhoodStats(requests) {
   const grouped = new Map();
 
@@ -111,26 +260,26 @@ function buildNeighborhoodStats(requests) {
   });
 
   const allNeighborhoods = Array.from(grouped.values()).map((entry) => ({
-      neighborhood: entry.neighborhood,
-      avgHours: roundTenths(entry.totalHours / entry.count),
-      avgDays: roundTenths(entry.totalHours / entry.count / 24),
-      count: entry.count
-    }));
+    neighborhood: entry.neighborhood,
+    avgHours: roundTenths(entry.totalHours / entry.count),
+    avgDays: roundTenths(entry.totalHours / entry.count / 24),
+    count: entry.count
+  }));
 
   state.excludedNeighborhoods = allNeighborhoods
-    .filter((entry) => entry.count < MIN_TICKETS_PER_NEIGHBORHOOD)
+    .filter((entry) => entry.count < MIN_TICKETS_PER_AREA)
     .sort((a, b) => a.neighborhood.localeCompare(b.neighborhood));
 
-  return allNeighborhoods.filter((entry) => entry.count >= MIN_TICKETS_PER_NEIGHBORHOOD);
+  return allNeighborhoods.filter((entry) => entry.count >= MIN_TICKETS_PER_AREA);
 }
 
-function parseRecords(records) {
+function parseRecords(records, city) {
   return records
     .map((record) => {
-      const neighborhood = normalizeNeighborhood(getField(record, ["neighborhood"]));
-      const openDate = getField(record, ["open_dt", "open_date"]);
-      const closedDate = getField(record, ["closed_dt", "closed_date"]);
-      const type = getField(record, ["type", "case_title", "reason"]);
+      const neighborhood = normalizeArea(getField(record, city.areaFields), city);
+      const openDate = getField(record, city.openFields);
+      const closedDate = getField(record, city.closedFields);
+      const type = getField(record, city.typeFields);
       const hours = calculateHoursToResolve(openDate, closedDate);
 
       return { neighborhood, openDate, closedDate, type, hours };
@@ -138,6 +287,7 @@ function parseRecords(records) {
     .filter(
       (request) =>
         request.hours >= 0 &&
+        request.hours <= MAX_RESOLUTION_HOURS &&
         request.neighborhood !== "null" &&
         request.neighborhood.toLowerCase() !== "null"
     );
@@ -157,10 +307,12 @@ function getSortedNeighborhoods() {
 }
 
 function renderSnapshot() {
+  const city = currentCity();
   const totalHours = state.requests.reduce((sum, request) => sum + request.hours, 0);
   const cityAvg = state.requests.length ? roundTenths(totalHours / state.requests.length) : 0;
   const fastest = state.neighborhoods.slice().sort((a, b) => a.avgHours - b.avgHours)[0];
 
+  els.dataSource.textContent = city.source;
   els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
   els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
   els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs / ${formatTenths(cityAvg / 24)} days`;
@@ -173,7 +325,7 @@ function renderRankings() {
   const slowestName = state.neighborhoods.slice().sort((a, b) => b.avgHours - a.avgHours)[0]?.neighborhood;
 
   if (!sorted.length) {
-    els.rankingBody.innerHTML = `<tr><td colspan="5">No neighborhoods match that filter.</td></tr>`;
+    els.rankingBody.innerHTML = `<tr><td colspan="5">No areas match that filter.</td></tr>`;
     return;
   }
 
@@ -217,7 +369,7 @@ function renderRawStats() {
         (entry) => `
           <article class="stat-item muted-stat">
             <span>${entry.neighborhood}</span>
-            <span>Excluded: ${entry.count} tickets, below ${MIN_TICKETS_PER_NEIGHBORHOOD} minimum</span>
+            <span>Excluded: ${entry.count} tickets, below ${MIN_TICKETS_PER_AREA} minimum</span>
           </article>
         `
       )
@@ -261,6 +413,21 @@ function renderRequestTypes() {
     .join("");
 }
 
+function renderContacts() {
+  const city = currentCity();
+
+  els.contactGrid.innerHTML = city.contacts
+    .map(
+      (contact) => `
+        <article>
+          <h3>${contact.title}</h3>
+          ${contact.lines.map((line) => `<p>${line}</p>`).join("")}
+        </article>
+      `
+    )
+    .join("");
+}
+
 function renderSimulator() {
   const targetDays = roundTenths(state.targetHours / 24);
   const passing = state.neighborhoods.filter((entry) => entry.avgHours <= state.targetHours);
@@ -269,7 +436,7 @@ function renderSimulator() {
     : 0;
 
   els.targetLabel.textContent = `${formatTenths(state.targetHours)} hours (${formatTenths(targetDays)} days)`;
-  els.simSummary.textContent = `Pass Rate: ${passRate}% Passed (${passing.length}/${state.neighborhoods.length} neighborhoods)`;
+  els.simSummary.textContent = `Pass Rate: ${passRate}% Passed (${passing.length}/${state.neighborhoods.length} areas)`;
 
   if (passRate >= 80) {
     els.simSummary.style.borderLeft = "6px solid var(--green)";
@@ -304,6 +471,7 @@ function renderAll() {
   renderRankings();
   renderRawStats();
   renderRequestTypes();
+  renderContacts();
   renderSimulator();
 }
 
@@ -323,26 +491,50 @@ function updateSliderBounds() {
   state.targetHours = startingTarget;
 }
 
+function renderLoading(city) {
+  els.dataSource.textContent = city.source;
+  els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
+  els.totalNeighborhoods.textContent = "--";
+  els.cityAverage.textContent = "--";
+  els.fastestArea.textContent = "--";
+  els.rankingBody.innerHTML = `<tr><td colspan="5">Loading ${city.name} rankings...</td></tr>`;
+  els.statsList.innerHTML = `<p>Loading ${city.name} area statistics...</p>`;
+  els.typeList.innerHTML = `<p>Loading ${city.name} request types...</p>`;
+  renderContacts();
+  els.simSummary.textContent = "Waiting for live data...";
+  els.simResults.innerHTML = "";
+}
+
 async function loadData() {
+  const city = currentCity();
+  renderLoading(city);
+
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(city.apiUrl);
     if (!response.ok) {
-      throw new Error(`Boston data request failed with status ${response.status}`);
+      throw new Error(`${city.name} data request failed with status ${response.status}`);
     }
 
     const data = await response.json();
-    const records = data?.result?.records || [];
-    state.requests = parseRecords(records);
+    const records = extractRecords(data, city);
+    state.requests = parseRecords(records, city);
     state.neighborhoods = buildNeighborhoodStats(state.requests);
     renderAll();
   } catch (error) {
-    els.rankingBody.innerHTML = `<tr><td colspan="5">Could not load Boston 311 data. Try refreshing the page later.</td></tr>`;
-    els.statsList.innerHTML = `<p>Could not load neighborhood statistics.</p>`;
+    els.rankingBody.innerHTML = `<tr><td colspan="5">Could not load ${city.name} 311 data. Try refreshing the page later.</td></tr>`;
+    els.statsList.innerHTML = `<p>Could not load area statistics.</p>`;
     els.typeList.innerHTML = `<p>Could not load request types.</p>`;
     els.simSummary.textContent = "Simulator unavailable until data loads.";
     console.error(error);
   }
 }
+
+els.citySelect.addEventListener("change", (event) => {
+  state.cityKey = event.target.value;
+  state.searchTerm = "";
+  els.search.value = "";
+  loadData();
+});
 
 els.sortToggle.addEventListener("click", () => {
   state.sortSlowestFirst = !state.sortSlowestFirst;

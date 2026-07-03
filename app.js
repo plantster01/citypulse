@@ -164,8 +164,10 @@ const CITY_CONFIGS = {
   }
 };
 
+const savedCityKey = localStorage.getItem("citypulseCity");
+
 const state = {
-  cityKey: "boston",
+  cityKey: CITY_CONFIGS[savedCityKey] ? savedCityKey : "boston",
   requests: [],
   neighborhoods: [],
   excludedNeighborhoods: [],
@@ -176,6 +178,7 @@ const state = {
 
 const els = {
   citySelect: document.querySelector("#city-select"),
+  selectedCity: document.querySelector("#selected-city"),
   dataSource: document.querySelector("#data-source"),
   recordLimit: document.querySelector("#record-limit"),
   totalNeighborhoods: document.querySelector("#total-neighborhoods"),
@@ -193,8 +196,25 @@ const els = {
   simResults: document.querySelector("#sim-results")
 };
 
+const hasDataViews = Boolean(
+  els.totalNeighborhoods ||
+  els.rankingBody ||
+  els.typeList ||
+  els.statsList ||
+  els.simResults ||
+  els.contactGrid
+);
+
 function currentCity() {
   return CITY_CONFIGS[state.cityKey];
+}
+
+function renderStaticCityStatus() {
+  const city = currentCity();
+  if (els.citySelect) els.citySelect.value = state.cityKey;
+  if (els.dataSource) els.dataSource.textContent = city.source;
+  if (els.recordLimit) els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
+  if (els.selectedCity) els.selectedCity.textContent = city.name;
 }
 
 function normalizeArea(value, city) {
@@ -312,14 +332,19 @@ function renderSnapshot() {
   const cityAvg = state.requests.length ? roundTenths(totalHours / state.requests.length) : 0;
   const fastest = state.neighborhoods.slice().sort((a, b) => a.avgHours - b.avgHours)[0];
 
-  els.dataSource.textContent = city.source;
-  els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
-  els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
-  els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs / ${formatTenths(cityAvg / 24)} days`;
-  els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
+  if (els.dataSource) els.dataSource.textContent = city.source;
+  if (els.selectedCity) els.selectedCity.textContent = city.name;
+  if (els.recordLimit) els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
+  if (els.totalNeighborhoods) els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
+  if (els.cityAverage) els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs / ${formatTenths(cityAvg / 24)} days`;
+  if (els.fastestArea) els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
 }
 
 function renderRankings() {
+  if (!els.rankingBody) {
+    return;
+  }
+
   const sorted = getSortedNeighborhoods();
   const fastestName = state.neighborhoods.slice().sort((a, b) => a.avgHours - b.avgHours)[0]?.neighborhood;
   const slowestName = state.neighborhoods.slice().sort((a, b) => b.avgHours - a.avgHours)[0]?.neighborhood;
@@ -352,6 +377,10 @@ function renderRankings() {
 }
 
 function renderRawStats() {
+  if (!els.statsList) {
+    return;
+  }
+
   const sorted = state.neighborhoods.slice().sort((a, b) => a.neighborhood.localeCompare(b.neighborhood));
 
   els.statsList.innerHTML = sorted
@@ -377,6 +406,10 @@ function renderRawStats() {
 }
 
 function renderRequestTypes() {
+  if (!els.typeList) {
+    return;
+  }
+
   const counts = new Map();
 
   state.requests.forEach((request) => {
@@ -414,6 +447,10 @@ function renderRequestTypes() {
 }
 
 function renderContacts() {
+  if (!els.contactGrid) {
+    return;
+  }
+
   const city = currentCity();
 
   els.contactGrid.innerHTML = city.contacts
@@ -429,6 +466,10 @@ function renderContacts() {
 }
 
 function renderSimulator() {
+  if (!els.targetLabel || !els.simSummary || !els.simResults) {
+    return;
+  }
+
   const targetDays = roundTenths(state.targetHours / 24);
   const passing = state.neighborhoods.filter((entry) => entry.avgHours <= state.targetHours);
   const passRate = state.neighborhoods.length
@@ -476,7 +517,7 @@ function renderAll() {
 }
 
 function updateSliderBounds() {
-  if (!state.neighborhoods.length) {
+  if (!els.targetSlider || !state.neighborhoods.length) {
     return;
   }
 
@@ -492,17 +533,19 @@ function updateSliderBounds() {
 }
 
 function renderLoading(city) {
-  els.dataSource.textContent = city.source;
-  els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
-  els.totalNeighborhoods.textContent = "--";
-  els.cityAverage.textContent = "--";
-  els.fastestArea.textContent = "--";
-  els.rankingBody.innerHTML = `<tr><td colspan="5">Loading ${city.name} rankings...</td></tr>`;
-  els.statsList.innerHTML = `<p>Loading ${city.name} area statistics...</p>`;
-  els.typeList.innerHTML = `<p>Loading ${city.name} request types...</p>`;
+  if (els.citySelect) els.citySelect.value = state.cityKey;
+  if (els.dataSource) els.dataSource.textContent = city.source;
+  if (els.selectedCity) els.selectedCity.textContent = city.name;
+  if (els.recordLimit) els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
+  if (els.totalNeighborhoods) els.totalNeighborhoods.textContent = "--";
+  if (els.cityAverage) els.cityAverage.textContent = "--";
+  if (els.fastestArea) els.fastestArea.textContent = "--";
+  if (els.rankingBody) els.rankingBody.innerHTML = `<tr><td colspan="5">Loading ${city.name} rankings...</td></tr>`;
+  if (els.statsList) els.statsList.innerHTML = `<p>Loading ${city.name} area statistics...</p>`;
+  if (els.typeList) els.typeList.innerHTML = `<p>Loading ${city.name} request types...</p>`;
   renderContacts();
-  els.simSummary.textContent = "Waiting for live data...";
-  els.simResults.innerHTML = "";
+  if (els.simSummary) els.simSummary.textContent = "Waiting for live data...";
+  if (els.simResults) els.simResults.innerHTML = "";
 }
 
 async function loadData() {
@@ -521,36 +564,54 @@ async function loadData() {
     state.neighborhoods = buildNeighborhoodStats(state.requests);
     renderAll();
   } catch (error) {
-    els.rankingBody.innerHTML = `<tr><td colspan="5">Could not load ${city.name} 311 data. Try refreshing the page later.</td></tr>`;
-    els.statsList.innerHTML = `<p>Could not load area statistics.</p>`;
-    els.typeList.innerHTML = `<p>Could not load request types.</p>`;
-    els.simSummary.textContent = "Simulator unavailable until data loads.";
+    if (els.rankingBody) els.rankingBody.innerHTML = `<tr><td colspan="5">Could not load ${city.name} 311 data. Try refreshing the page later.</td></tr>`;
+    if (els.statsList) els.statsList.innerHTML = `<p>Could not load area statistics.</p>`;
+    if (els.typeList) els.typeList.innerHTML = `<p>Could not load request types.</p>`;
+    if (els.simSummary) els.simSummary.textContent = "Simulator unavailable until data loads.";
     console.error(error);
   }
 }
 
-els.citySelect.addEventListener("change", (event) => {
-  state.cityKey = event.target.value;
-  state.searchTerm = "";
-  els.search.value = "";
+if (els.citySelect) {
+  renderStaticCityStatus();
+  els.citySelect.addEventListener("change", (event) => {
+    state.cityKey = event.target.value;
+    state.searchTerm = "";
+    localStorage.setItem("citypulseCity", state.cityKey);
+    if (els.search) els.search.value = "";
+    if (hasDataViews) {
+      loadData();
+    } else {
+      renderStaticCityStatus();
+    }
+  });
+}
+
+if (els.sortToggle) {
+  els.sortToggle.addEventListener("click", () => {
+    state.sortSlowestFirst = !state.sortSlowestFirst;
+    els.sortToggle.textContent = state.sortSlowestFirst ? "Fastest first" : "Slowest first";
+    els.sortToggle.setAttribute("aria-pressed", String(state.sortSlowestFirst));
+    renderRankings();
+  });
+}
+
+if (els.search) {
+  els.search.addEventListener("input", (event) => {
+    state.searchTerm = event.target.value.trim().toLowerCase();
+    renderRankings();
+  });
+}
+
+if (els.targetSlider) {
+  els.targetSlider.addEventListener("input", (event) => {
+    state.targetHours = Number(event.target.value);
+    renderSimulator();
+  });
+}
+
+if (hasDataViews) {
   loadData();
-});
-
-els.sortToggle.addEventListener("click", () => {
-  state.sortSlowestFirst = !state.sortSlowestFirst;
-  els.sortToggle.textContent = state.sortSlowestFirst ? "Fastest first" : "Slowest first";
-  els.sortToggle.setAttribute("aria-pressed", String(state.sortSlowestFirst));
-  renderRankings();
-});
-
-els.search.addEventListener("input", (event) => {
-  state.searchTerm = event.target.value.trim().toLowerCase();
-  renderRankings();
-});
-
-els.targetSlider.addEventListener("input", (event) => {
-  state.targetHours = Number(event.target.value);
-  renderSimulator();
-});
-
-loadData();
+} else {
+  renderStaticCityStatus();
+}

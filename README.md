@@ -1,6 +1,6 @@
 # CityPulse
 
-CityPulse is a civic data dashboard that turns public Boston 311 service request records into neighborhood-level accountability metrics. It helps residents, advocates, and officials see where city service requests are resolved quickly, where delays appear, and how response-time goals affect different neighborhoods.
+CityPulse is a civic data dashboard that turns public Boston 311 service request records into neighborhood-level accountability metrics. It helps residents, advocates, and officials see where city service requests are resolved quickly, where delays appear, and how response-time goals affect different neighborhoods.   
 
 The project began as a Java data-analysis application and has been rebuilt as a public-facing static website for GitHub Pages.
 

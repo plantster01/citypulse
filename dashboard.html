@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CityPulse</title>
+    <meta
+      name="description"
+      content="CityPulse turns public 311 service request data into area-level response-time rankings, equity stats, and target simulations."
+    >
+    <link rel="stylesheet" href="./styles.css?v=47">
+  </head>
+  <body>
+    <div class="cursor-glow" aria-hidden="true"></div>
+    <header class="page-header">
+      <nav class="topbar" aria-label="Primary">
+        <a class="brand" href="./index.html" aria-label="CityPulse home">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="logo-buildings"></span>
+          </span>
+          <span>CityPulse</span>
+        </a>
+        <div class="nav-links">
+          <a href="./index.html">Home</a>
+          <a href="./dashboard.html" aria-current="page">Dashboard</a>
+          <a href="./about.html">About</a>
+          <a href="./roadmap.html">Roadmap</a>
+          <a href="./team.html">Team</a>
+        </div>
+      </nav>
+
+      <section class="page-hero dashboard-page-hero" id="overview">
+        <p class="eyebrow">Live dashboard</p>
+        <h1>CityPulse dashboard.</h1>
+        <p>
+          Review the selected city’s 311 response-time snapshot, rankings, request mix, and
+          service target simulator.
+        </p>
+        <div class="hero-actions">
+          <a class="secondary-action" href="./index.html">Back home</a>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="metric-band" aria-label="Citywide snapshot">
+        <article>
+          <span class="metric-label">Selected city</span>
+          <strong id="selected-city">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Service areas</span>
+          <strong id="total-neighborhoods">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Citywide average</span>
+          <strong id="city-average">--</strong>
+        </article>
+        <article>
+          <span class="metric-label">Fastest area</span>
+          <strong id="fastest-area">--</strong>
+        </article>
+      </section>
+
+      <section class="audience-strip" aria-label="Who CityPulse is for">
+        <span>Built for residents</span>
+        <span>Useful for advocates</span>
+        <span>Readable for officials</span>
+      </section>
+
+      <section class="section-grid" id="rankings">
+        <div class="section-intro">
+          <p class="eyebrow">Live pilot</p>
+          <h2>Compare service response times across the city.</h2>
+          <p>
+            Rankings use a larger live sample of closed requests, apply a transparent 30-day
+            outlier guard, and only include areas with enough tickets to make the averages useful.
+          </p>
+        </div>
+
+        <div class="tool-surface">
+          <div class="control-row">
+            <label class="search-field">
+              <span>Filter areas</span>
+              <input id="neighborhood-search" type="search" placeholder="Type an area">
+            </label>
+            <button class="icon-button" id="sort-toggle" type="button" aria-pressed="false">
+              Slowest first
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Area</th>
+                  <th scope="col">Avg hours</th>
+                  <th scope="col">Avg days</th>
+                  <th scope="col">Tickets</th>
+                </tr>
+              </thead>
+              <tbody id="ranking-body">
+                <tr>
+                  <td colspan="5">Loading rankings...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-grid compact-section" id="request-types">
+        <div class="section-intro">
+          <p class="eyebrow">Demand signals</p>
+          <h2>See what residents are reporting most.</h2>
+          <p>
+            See which issues residents are reporting most often, from parking and streets to
+            sanitation and neighborhood services.
+          </p>
+        </div>
+
+        <div class="tool-surface">
+          <div class="type-list" id="type-list">
+            <p>Loading request types...</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-grid alt" id="simulator">
+        <div class="section-intro">
+          <p class="eyebrow">Policy simulator</p>
+          <h2>Set a service goal and see who meets it.</h2>
+          <p>
+            Choose a target response time and CityPulse will show which areas are meeting
+            that standard based on recent 311 request data.
+          </p>
+        </div>
+
+        <div class="tool-surface">
+          <div class="slider-header">
+            <label for="target-slider">Target resolution time</label>
+            <strong id="target-label">72.0 hours (3.0 days)</strong>
+          </div>
+          <input id="target-slider" type="range" min="12" max="168" value="72" step="1">
+          <div class="sim-summary" id="sim-summary">Waiting for live data...</div>
+          <div class="result-list" id="sim-results" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="section-grid" id="raw-stats">
+        <div class="section-intro">
+          <p class="eyebrow">Area detail</p>
+          <h2>Check the underlying averages.</h2>
+          <p>
+            Review each area’s average response time alongside its ticket count. Areas
+            with too few valid records are marked separately so the public rankings stay fair and
+            reliable.
+          </p>
+        </div>
+
+        <div class="stat-list" id="stats-list">
+          <p>Loading area statistics...</p>
+        </div>
+      </section>
+
+      <section class="info-band" id="about">
+        <div>
+          <p class="eyebrow">Data notes</p>
+          <h2>CityPulse keeps the ranking simple and transparent.</h2>
+        </div>
+        <p>
+          The website requests up to 25,000 public JSON records from the selected city’s 311 data
+          source, keeps records with area names plus open and closed dates, uses a 30-day outlier
+          guard for unusually long-running cases, then averages resolution time by area.
+        </p>
+      </section>
+
+      <section class="section-grid action-section" id="action">
+        <div class="section-intro">
+          <p class="eyebrow">Civic action</p>
+          <h2>Use the numbers as evidence when reporting service gaps.</h2>
+          <p>
+            If your area shows slower resolution times, cite the average wait and ticket
+            count when contacting local leadership or filing a follow-up request.
+          </p>
+        </div>
+
+        <div class="contact-grid" id="contact-grid">
+          <article>
+            <h3>City 311 portal</h3>
+            <p>File or follow up through the city’s official 311 service.</p>
+          </article>
+          <article>
+            <h3>Local representatives</h3>
+            <p>Share the area average, ticket count, and comparison to citywide response time.</p>
+          </article>
+          <article>
+            <h3>Community groups</h3>
+            <p>Use CityPulse rankings to support neighborhood meetings or public testimony.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Founded by Aarin Mugundu.</p>
+      <a href="https://github.com/plantster01/citypulse" target="_blank" rel="noreferrer">GitHub</a>
+    </footer>
+
+    <script src="./effects.js?v=47"></script>
+    <script src="./app.js?v=47"></script>
+  </body>
+</html>

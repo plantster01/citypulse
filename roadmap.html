@@ -8,15 +8,15 @@
       name="description"
       content="CityPulse product roadmap for civic service accountability."
     >
-    <link rel="stylesheet" href="./styles.css?v=5">
+    <link rel="stylesheet" href="./styles.css?v=19">
   </head>
   <body>
+    <div class="cursor-glow" aria-hidden="true"></div>
     <header class="page-header">
       <nav class="topbar" aria-label="Primary">
         <a class="brand" href="./index.html" aria-label="CityPulse home">
           <span class="brand-mark" aria-hidden="true">
             <span class="logo-buildings"></span>
-            <span class="logo-heart"></span>
           </span>
           <span>CityPulse</span>
         </a>
@@ -39,33 +39,96 @@
     </header>
 
     <main class="page-main">
-      <section class="timeline">
-        <article>
-          <span>Now</span>
-          <h3>Boston 311 dashboard</h3>
-          <p>Live rankings, request mix, reliability filtering, and a response-time target simulator.</p>
-        </article>
-        <article>
-          <span>Next</span>
-          <h3>Neighborhood reports</h3>
-          <p>Auto-generated summaries residents can share with officials or community groups.</p>
-        </article>
-        <article>
-          <span>Later</span>
-          <h3>Trend detection</h3>
-          <p>Track whether response times are improving or worsening over weeks and months.</p>
-        </article>
-        <article>
-          <span>Future</span>
-          <h3>Multi-city expansion</h3>
-          <p>Bring the same public accountability metrics to other cities with open 311 data.</p>
-        </article>
+      <section class="roadmap-map" aria-label="CityPulse product roadmap">
+        <div class="map-route" aria-hidden="true">
+          <span></span>
+        </div>
+
+        <div class="map-milestones">
+          <button
+            class="map-stop is-active"
+            type="button"
+            data-title="Boston 311 pilot"
+            data-kicker="Current pilot"
+            data-body="Keep improving the live dashboard: cleaner neighborhood rankings, request mix, reliability filtering, and a target simulator residents can understand quickly."
+            data-goal="End goal: make Boston service response patterns visible enough that residents, advocates, and officials can discuss them from the same evidence base."
+            aria-pressed="true"
+          >
+            <span class="map-pin" data-step="1" aria-hidden="true"></span>
+            <span class="map-card">
+              <span>Current pilot</span>
+              <strong>Boston dashboard</strong>
+            </span>
+          </button>
+
+          <button
+            class="map-stop"
+            type="button"
+            data-title="Neighborhood reports"
+            data-kicker="Next build"
+            data-body="Generate clean, shareable neighborhood summaries with average response time, top request types, comparison to citywide baseline, and sample size context."
+            data-goal="End goal: let a resident copy one public-facing report into an email, community meeting, or city council testimony."
+            aria-pressed="false"
+          >
+            <span class="map-pin" data-step="2" aria-hidden="true"></span>
+            <span class="map-card">
+              <span>Next build</span>
+              <strong>Reports</strong>
+            </span>
+          </button>
+
+          <button
+            class="map-stop"
+            type="button"
+            data-title="Trend detection"
+            data-kicker="Analytics layer"
+            data-body="Track whether response times are improving or worsening over weeks and months, then flag neighborhoods where service gaps appear persistent."
+            data-goal="End goal: move CityPulse from a snapshot dashboard into a lightweight civic monitoring system."
+            aria-pressed="false"
+          >
+            <span class="map-pin" data-step="3" aria-hidden="true"></span>
+            <span class="map-card">
+              <span>Analytics layer</span>
+              <strong>Trends</strong>
+            </span>
+          </button>
+
+          <button
+            class="map-stop"
+            type="button"
+            data-title="Multi-city expansion"
+            data-kicker="Future platform"
+            data-body="Adapt the CityPulse pipeline for other cities with open 311-style datasets, using consistent metrics while respecting each city’s data structure."
+            data-goal="End goal: become a civic data layer that compares public service reliability across neighborhoods and cities."
+            aria-pressed="false"
+          >
+            <span class="map-pin" data-step="4" aria-hidden="true"></span>
+            <span class="map-card">
+              <span>Future platform</span>
+              <strong>Multi-city</strong>
+            </span>
+          </button>
+        </div>
+
+        <aside class="map-detail" aria-live="polite">
+          <span id="map-detail-kicker">Current pilot</span>
+          <h2 id="map-detail-title">Boston 311 pilot</h2>
+          <p id="map-detail-body">
+            Keep improving the live dashboard: cleaner neighborhood rankings, request mix,
+            reliability filtering, and a target simulator residents can understand quickly.
+          </p>
+          <p id="map-detail-goal">
+            End goal: make Boston service response patterns visible enough that residents,
+            advocates, and officials can discuss them from the same evidence base.
+          </p>
+        </aside>
       </section>
     </main>
 
     <footer>
-      <p>Founded by Aarin Mugundu, LHS '27.</p>
+      <p>Founded by Aarin Mugundu.</p>
       <a href="./index.html">Open dashboard</a>
     </footer>
+    <script src="./effects.js?v=19"></script>
   </body>
 </html>

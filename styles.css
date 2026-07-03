@@ -458,8 +458,39 @@ button:active {
   color: var(--muted);
 }
 
+.status-row label {
+  color: var(--muted);
+}
+
 .status-row strong {
   font-weight: 400;
+}
+
+.city-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  align-items: stretch;
+}
+
+.city-row select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(14, 124, 134, 0.28);
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, rgba(239, 255, 255, 0.96), rgba(174, 233, 236, 0.42));
+  color: var(--ink);
+  font: inherit;
+  font-weight: 500;
+  padding: 0 12px;
+  box-shadow: 0 10px 24px rgba(13, 28, 42, 0.08);
+  cursor: pointer;
+}
+
+.city-row select:focus {
+  outline: 2px solid rgba(11, 92, 171, 0.16);
+  border-color: var(--blue);
 }
 
 main {
@@ -1152,6 +1183,27 @@ input[type="range"] {
 .stat-list {
   display: grid;
   gap: 10px;
+  max-height: 520px;
+  overflow: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(14, 124, 134, 0.42) transparent;
+}
+
+.stat-list::-webkit-scrollbar,
+.result-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.stat-list::-webkit-scrollbar-track,
+.result-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.stat-list::-webkit-scrollbar-thumb,
+.result-list::-webkit-scrollbar-thumb {
+  background: rgba(14, 124, 134, 0.32);
+  border-radius: 999px;
 }
 
 .stat-item {
@@ -1236,8 +1288,8 @@ input[type="range"] {
 .contact-grid p {
   margin: 6px 0 0;
   color: var(--muted);
-  overflow-wrap: normal;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 footer {

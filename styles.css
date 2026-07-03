@@ -47,6 +47,11 @@ a {
   flex-direction: column;
 }
 
+.page-header {
+  background: #101820;
+  color: white;
+}
+
 .topbar {
   width: min(1160px, calc(100% - 32px));
   margin: 0 auto;
@@ -74,10 +79,68 @@ a {
   width: 42px;
   height: 42px;
   border: 2px solid rgba(255, 255, 255, 0.72);
-  display: grid;
-  place-items: center;
-  font-size: 0.82rem;
+  display: block;
+  position: relative;
   background: rgba(255, 255, 255, 0.13);
+  overflow: hidden;
+}
+
+.brand-mark::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 9px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.logo-buildings {
+  position: absolute;
+  left: 10px;
+  bottom: 11px;
+  width: 5px;
+  height: 12px;
+  background: white;
+  box-shadow:
+    7px -5px 0 white,
+    14px -1px 0 white,
+    21px -8px 0 white;
+}
+
+.logo-heart {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  right: 9px;
+  top: 10px;
+  background: #ffddd8;
+  transform: rotate(45deg);
+}
+
+.logo-heart::before,
+.logo-heart::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffddd8;
+}
+
+.logo-heart::before {
+  left: -4px;
+  top: 0;
+}
+
+.logo-heart::after {
+  left: 0;
+  top: -4px;
+}
+
+.page-header .brand-mark {
+  border-color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .nav-links a {
@@ -125,6 +188,23 @@ h1 {
   font-size: clamp(2.6rem, 7vw, 5.65rem);
   line-height: 0.94;
   max-width: 10.7em;
+}
+
+.page-hero {
+  width: min(980px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 90px 0 110px;
+}
+
+.page-hero .eyebrow {
+  color: #bfe0ff;
+}
+
+.page-hero p:not(.eyebrow) {
+  max-width: 720px;
+  margin: 22px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1.1rem;
 }
 
 h2 {
@@ -283,6 +363,82 @@ main {
   width: min(1160px, calc(100% - 32px));
   margin: 0 auto;
   padding: 96px 0 0;
+}
+
+.page-main {
+  width: min(1160px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.split-section {
+  padding: 92px 0 0;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 54px;
+  align-items: start;
+}
+
+.split-section > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.06rem;
+}
+
+.feature-grid,
+.timeline {
+  padding-top: 42px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.feature-grid article,
+.timeline article,
+.founder-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.feature-grid p,
+.timeline p,
+.founder-card p {
+  color: var(--muted);
+}
+
+.timeline {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-top: 92px;
+}
+
+.timeline span {
+  color: var(--blue);
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.8rem;
+}
+
+.founder-card {
+  margin-top: 92px;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.founder-mark {
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
+  background: var(--blue);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 1.55rem;
 }
 
 .section-grid {
@@ -553,19 +709,34 @@ footer a {
 }
 
 @media (max-width: 900px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 12px 0;
+  }
+
   .nav-links {
-    display: none;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
   }
 
   .hero,
   .section-grid,
-  .info-band {
+  .info-band,
+  .split-section,
+  .feature-grid,
+  .timeline,
+  .founder-card {
     grid-template-columns: 1fr;
   }
 
   .hero {
     gap: 32px;
     padding-top: 42px;
+  }
+
+  .page-hero {
+    padding: 70px 0 82px;
   }
 
   .status-panel {
@@ -618,6 +789,13 @@ footer a {
   .info-band,
   .alt {
     padding-top: 72px;
+  }
+
+  .split-section,
+  .timeline,
+  .founder-card {
+    padding-top: 72px;
+    margin-top: 0;
   }
 
   .tool-surface {

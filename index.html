@@ -8,7 +8,7 @@
       name="description"
       content="CityPulse turns Boston 311 service request data into neighborhood response-time rankings, equity stats, and target simulations."
     >
-    <link rel="stylesheet" href="./styles.css?v=21">
+    <link rel="stylesheet" href="./styles.css?v=24">
   </head>
   <body>
     <div class="cursor-glow" aria-hidden="true"></div>
@@ -36,6 +36,20 @@
             CityPulse turns public 311 records into neighborhood-level accountability metrics, so
             residents can see where city services are fast, delayed, or uneven.
           </p>
+          <div class="hero-explainer" aria-label="How CityPulse works">
+            <article>
+              <span>1</span>
+              <p>Pulls recent closed Boston 311 service requests.</p>
+            </article>
+            <article>
+              <span>2</span>
+              <p>Calculates how long each request took to resolve.</p>
+            </article>
+            <article>
+              <span>3</span>
+              <p>Ranks neighborhoods using reliable sample sizes.</p>
+            </article>
+          </div>
           <div class="hero-actions">
             <a class="primary-action" href="#rankings">Explore live pilot</a>
             <a class="secondary-action" href="./roadmap.html">View roadmap</a>
@@ -50,10 +64,6 @@
           <div class="status-row">
             <span>Records requested</span>
             <strong id="record-limit">10,000</strong>
-          </div>
-          <div class="status-row">
-            <span>Reliability rule</span>
-            <strong>25+ tickets</strong>
           </div>
         </aside>
       </section>
@@ -72,17 +82,6 @@
         <article>
           <span class="metric-label">Fastest area</span>
           <strong id="fastest-area">--</strong>
-        </article>
-      </section>
-
-      <section class="insight-strip" aria-label="Citywide insights">
-        <article>
-          <span class="metric-label">Slowest area</span>
-          <strong id="slowest-area">--</strong>
-        </article>
-        <article>
-          <span class="metric-label">Top request type</span>
-          <strong id="top-request-type">--</strong>
         </article>
       </section>
 
@@ -157,9 +156,8 @@
           <p class="eyebrow">Policy simulator</p>
           <h2>Set a service goal and see who meets it.</h2>
           <p>
-            The slider starts at the fastest reliable neighborhood average and ends at the slowest
-            reliable neighborhood average. At the maximum value, every ranked neighborhood meets
-            the target.
+            Choose a target response time and CityPulse will show which neighborhoods are meeting
+            that standard based on recent 311 request data.
           </p>
         </div>
 
@@ -192,8 +190,8 @@
 
       <section class="info-band" id="about">
         <div>
-          <p class="eyebrow">How it works</p>
-          <h2>CityPulse converts open civic data into public accountability metrics.</h2>
+          <p class="eyebrow">Data notes</p>
+          <h2>CityPulse keeps the ranking simple and transparent.</h2>
         </div>
         <p>
           The website requests up to 10,000 public JSON records from the Boston 311 Service
@@ -240,7 +238,7 @@
       </a>
     </footer>
 
-    <script src="./effects.js?v=21"></script>
-    <script src="./app.js?v=21"></script>
+    <script src="./effects.js?v=24"></script>
+    <script src="./app.js?v=24"></script>
   </body>
 </html>

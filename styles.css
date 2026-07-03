@@ -395,7 +395,7 @@ main {
 
 .metric-band {
   width: min(1160px, calc(100% - 32px));
-  margin: -34px auto 0;
+  margin: 28px auto 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 12px;
@@ -1384,7 +1384,7 @@ footer a {
   }
 
   .metric-band {
-    margin-top: 20px;
+    margin-top: 24px;
   }
 
   .contact-grid p {

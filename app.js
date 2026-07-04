@@ -41,7 +41,6 @@ const NYC_AREA_ALIASES = {
 };
 
 const SF_AREA_ALIASES = {};
-const LA_AREA_ALIASES = {};
 
 const CITY_CONFIGS = {
   boston: {
@@ -122,52 +121,11 @@ const CITY_CONFIGS = {
         lines: ["sf.gov", "Use response data when raising service gaps."]
       }
     ]
-  },
-  la: {
-    name: "Los Angeles",
-    source: "LA Open Data",
-    apiUrl:
-      "https://data.lacity.org/resource/pvft-t768.json?$limit=25000",
-    responseType: "socrata",
-    areaAliases: LA_AREA_ALIASES,
-    allowUnmappedAreas: true,
-    numericAreaPrefix: "Council District",
-    areaFields: [
-      "nc_name",
-      "neighborhood_council_name",
-      "neighborhoodcouncilname",
-      "neighborhood_council",
-      "community",
-      "community_name",
-      "nc",
-      "council_district",
-      "councildistrict",
-      "cd"
-    ],
-    openFields: ["createddate", "created_date", "created_dt", "open_date"],
-    closedFields: ["closeddate", "closed_date", "updateddate", "updated_date"],
-    typeFields: ["requesttype", "request_type", "srtype", "service_name"],
-    contacts: [
-      {
-        title: "LA 311",
-        lines: ["lacity.gov/myla311", "Call 311 in Los Angeles"]
-      },
-      {
-        title: "Los Angeles City Council",
-        lines: ["council.lacity.gov", "Share neighborhood-level evidence with your council district."]
-      },
-      {
-        title: "Mayor's Help Desk",
-        lines: ["mayor.lacity.gov", "Use response data when raising service gaps."]
-      }
-    ]
   }
 };
 
-const savedCityKey = localStorage.getItem("citypulseCity");
-
 const state = {
-  cityKey: CITY_CONFIGS[savedCityKey] ? savedCityKey : "boston",
+  cityKey: "boston",
   requests: [],
   neighborhoods: [],
   excludedNeighborhoods: [],
@@ -577,7 +535,6 @@ if (els.citySelect) {
   els.citySelect.addEventListener("change", (event) => {
     state.cityKey = event.target.value;
     state.searchTerm = "";
-    localStorage.setItem("citypulseCity", state.cityKey);
     if (els.search) els.search.value = "";
     if (hasDataViews) {
       loadData();

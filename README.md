@@ -17,7 +17,7 @@ https://plantster01.github.io/citypulse/
 
 ## How It Works
 
-CityPulse currently supports public 311 datasets from Boston, New York City and San Francisco.
+CityPulse currently supports public 311 datasets from Boston, New York City, and San Francisco.
 
 1. The website requests recent public 311 records from the selected city’s open data API.
 2. It keeps closed requests with valid area names and open/closed timestamps.

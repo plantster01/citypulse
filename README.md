@@ -17,7 +17,7 @@ https://plantster01.github.io/citypulse/
 
 ## How It Works
 
-CityPulse currently supports public 311 datasets from Boston, New York City, San Francisco, and Los Angeles.
+CityPulse currently supports public 311 datasets from Boston, New York City and San Francisco.
 
 1. The website requests recent public 311 records from the selected city’s open data API.
 2. It keeps closed requests with valid area names and open/closed timestamps.
@@ -42,15 +42,11 @@ San Francisco dataset: 311 Cases
 San Francisco portal: DataSF  
 San Francisco link: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6
 
-Los Angeles dataset: MyLA311 Service Request Data  
-Los Angeles portal: LA Open Data  
-Los Angeles link: https://data.lacity.org/
-
 CityPulse currently requests up to 25,000 public records from the selected city API.
 
 ## Roadmap
 
-CityPulse started with Boston 311 and now includes an early multi-city version with New York City, San Francisco, and Los Angeles. The broader goal is to become a lightweight civic accountability layer for public service data.
+CityPulse started with Boston 311 and now includes an early multi-city version with New York City and San Francisco. The broader goal is to become a lightweight civic accountability layer for public service data.
 
 Planned directions include:
 

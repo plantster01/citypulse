@@ -546,6 +546,11 @@ button:active {
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
+.city-row select option {
+  background: #ffffff;
+  color: var(--ink);
+}
+
 .city-row select:hover {
   border-color: rgba(11, 92, 171, 0.42);
   box-shadow:

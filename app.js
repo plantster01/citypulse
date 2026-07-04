@@ -124,8 +124,10 @@ const CITY_CONFIGS = {
   }
 };
 
+const requestedCityKey = new URLSearchParams(window.location.search).get("city");
+
 const state = {
-  cityKey: "boston",
+  cityKey: CITY_CONFIGS[requestedCityKey] ? requestedCityKey : "boston",
   requests: [],
   neighborhoods: [],
   excludedNeighborhoods: [],
@@ -136,6 +138,7 @@ const state = {
 
 const els = {
   citySelect: document.querySelector("#city-select"),
+  launchAction: document.querySelector(".launch-action"),
   selectedCity: document.querySelector("#selected-city"),
   dataSource: document.querySelector("#data-source"),
   recordLimit: document.querySelector("#record-limit"),
@@ -170,6 +173,7 @@ function currentCity() {
 function renderStaticCityStatus() {
   const city = currentCity();
   if (els.citySelect) els.citySelect.value = state.cityKey;
+  if (els.launchAction) els.launchAction.href = `./dashboard.html?city=${state.cityKey}`;
   if (els.dataSource) els.dataSource.textContent = city.source;
   if (els.recordLimit) els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
   if (els.selectedCity) els.selectedCity.textContent = city.name;

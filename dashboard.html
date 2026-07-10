@@ -8,7 +8,7 @@
       name="description"
       content="CityPulse turns public 311 service request data into area-level response-time rankings, equity stats, and target simulations."
     >
-    <link rel="stylesheet" href="./styles.css?v=49">
+    <link rel="stylesheet" href="./styles.css?v=53">
   </head>
   <body>
     <div class="cursor-glow" aria-hidden="true"></div>
@@ -170,9 +170,9 @@
           <h2>CityPulse keeps the ranking simple and transparent.</h2>
         </div>
         <p>
-          The website requests up to 25,000 public JSON records from the selected city’s 311 data
-          source, keeps records with area names plus open and closed dates, uses a 30-day outlier
-          guard for unusually long-running cases, then averages resolution time by area.
+          The website requests up to 25,000 recently closed public JSON records from each selected
+          311 source file. For Boston, CityPulse combines the old and new Analyze Boston 311 files
+          before filtering for area names, open and closed dates, and the 30-day outlier guard.
         </p>
       </section>
 
@@ -208,7 +208,7 @@
       <a href="https://github.com/plantster01/citypulse" target="_blank" rel="noreferrer">GitHub</a>
     </footer>
 
-    <script src="./effects.js?v=49"></script>
-    <script src="./app.js?v=49"></script>
+    <script src="./effects.js?v=53"></script>
+    <script src="./app.js?v=53"></script>
   </body>
 </html>

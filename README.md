@@ -19,38 +19,26 @@ https://plantster01.github.io/citypulse/
 
 CityPulse currently supports public 311 datasets from Boston, New York City, and San Francisco.
 
-1. The website requests recent public 311 records from the selected city’s open data API.
+1. The website requests recently closed public 311 records from the selected city’s open data API.
 2. It keeps closed requests with valid area names and open/closed timestamps.
 3. It uses a 30-day outlier guard so rare old closures do not distort the averages.
 4. It calculates how many hours each request took to resolve.
 5. It groups requests by area.
 6. It ranks areas using only places with enough tickets to avoid tiny-sample distortion.
 
-The site runs entirely in the browser. There is no backend server, database, or private data collection.
-
 ## Data Source
 
 Boston dataset: Boston 311 Service Requests  
 Boston portal: Analyze Boston  
-Boston link: https://data.boston.gov/dataset/311-service-requests
+Boston old system API used: https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=25000&sort=closed_dt%20desc  
+Boston new system API used: https://data.boston.gov/api/3/action/datastore_search?resource_id=254adca6-64ab-4c5c-9fc0-a6da622be185&limit=25000&sort=Close%20Date%20desc
 
 NYC dataset: 311 Service Requests  
 NYC portal: NYC Open Data  
-NYC link: https://data.cityofnewyork.us/Social-Services/311-Service-Requests/erm2-nwe9
+NYC API used: https://data.cityofnewyork.us/resource/erm2-nwe9.json
 
 San Francisco dataset: 311 Cases  
 San Francisco portal: DataSF  
-San Francisco link: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6
+San Francisco API used: https://data.sfgov.org/resource/vw6y-z8j6.json
 
-CityPulse currently requests up to 25,000 public records from the selected city API.
-
-## Roadmap
-
-CityPulse started with Boston 311 and now includes an early multi-city version with New York City and San Francisco. The broader goal is to become a lightweight civic accountability layer for public service data.
-
-Planned directions include:
-
-- Shareable area reports
-- Trend detection over time
-- More transparent reliability notes for sample sizes
-- Expansion to more cities with open 311-style datasets
+CityPulse currently requests up to 25,000 recently closed public records from each selected city source file.

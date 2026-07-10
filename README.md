@@ -26,7 +26,7 @@ CityPulse currently supports public 311 datasets from Boston, New York City, and
 3. It uses a 30-day outlier guard so rare old closures do not distort the averages.
 4. It calculates how many hours each request took to resolve.
 5. It groups requests by area.
-6. It ranks areas using only places with enough tickets to avoid tiny-sample distortion.
+6. It ranks areas using only places with at least 25 tickets to avoid tiny-sample distortion.
 
 The site runs entirely in the browser. There is no backend server, database, or private data collection.
 

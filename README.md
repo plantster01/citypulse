@@ -28,8 +28,6 @@ CityPulse currently supports public 311 datasets from Boston, New York City, and
 
 ## Data Source
 
-## Data Source
-
 Boston dataset: Boston 311 Service Requests  
 Boston portal: Analyze Boston  
 Boston old system source: https://data.boston.gov/dataset/311-service-requests/resource/1a0b420d-99f1-4887-9851-990b2a5a6e17  

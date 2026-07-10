@@ -48,13 +48,13 @@ const CITY_CONFIGS = {
     source: "Analyze Boston old + new 311 systems",
     apiUrls: [
       "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=25000&sort=closed_dt%20desc",
-      "https://data.boston.gov/api/3/action/datastore_search?resource_id=254adca6-64ab-4c5c-9fc0-a6da622be185&limit=25000&sort=Close%20Date%20desc"
+      "https://data.boston.gov/api/3/action/datastore_search?resource_id=254adca6-64ab-4c5c-9fc0-a6da622be185&limit=25000&sort=close_date%20desc"
     ],
     responseType: "ckan",
     areaAliases: BOSTON_AREA_ALIASES,
     areaFields: ["neighborhood", "Neighborhood", "NEIGHBORHOOD"],
     openFields: ["open_dt", "open_date", "Open Date", "OPEN_DT"],
-    closedFields: ["closed_dt", "closed_date", "Close Date", "Closed Date", "CLOSED_DT"],
+    closedFields: ["closed_dt", "closed_date", "close_date", "Close Date", "Closed Date", "CLOSED_DT"],
     typeFields: ["type", "case_title", "reason", "Case Topic", "Service Name", "Assigned Department", "CASE_TITLE", "TYPE", "REASON"],
     contacts: [
       {

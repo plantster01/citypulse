@@ -45,15 +45,17 @@ const SF_AREA_ALIASES = {};
 const CITY_CONFIGS = {
   boston: {
     name: "Boston",
-    source: "Analyze Boston",
-    apiUrl:
-      "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=25000",
+    source: "Analyze Boston old + new 311 systems",
+    apiUrls: [
+      "https://data.boston.gov/api/3/action/datastore_search?resource_id=1a0b420d-99f1-4887-9851-990b2a5a6e17&limit=25000&sort=closed_dt%20desc",
+      "https://data.boston.gov/api/3/action/datastore_search?resource_id=254adca6-64ab-4c5c-9fc0-a6da622be185&limit=25000&sort=Close%20Date%20desc"
+    ],
     responseType: "ckan",
     areaAliases: BOSTON_AREA_ALIASES,
-    areaFields: ["neighborhood"],
-    openFields: ["open_dt", "open_date"],
-    closedFields: ["closed_dt", "closed_date"],
-    typeFields: ["type", "case_title", "reason"],
+    areaFields: ["neighborhood", "Neighborhood", "NEIGHBORHOOD"],
+    openFields: ["open_dt", "open_date", "Open Date", "OPEN_DT"],
+    closedFields: ["closed_dt", "closed_date", "Close Date", "Closed Date", "CLOSED_DT"],
+    typeFields: ["type", "case_title", "reason", "Case Topic", "Service Name", "Assigned Department", "CASE_TITLE", "TYPE", "REASON"],
     contacts: [
       {
         title: "Boston 311",
@@ -175,7 +177,11 @@ function renderStaticCityStatus() {
   if (els.citySelect) els.citySelect.value = state.cityKey;
   if (els.launchAction) els.launchAction.href = `./dashboard.html?city=${state.cityKey}`;
   if (els.dataSource) els.dataSource.textContent = city.source;
-  if (els.recordLimit) els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
+  if (els.recordLimit) {
+    els.recordLimit.textContent = city.apiUrls
+      ? `${RECORD_LIMIT.toLocaleString()} per file`
+      : RECORD_LIMIT.toLocaleString();
+  }
   if (els.selectedCity) els.selectedCity.textContent = city.name;
 }
 
@@ -192,12 +198,34 @@ function normalizeArea(value, city) {
   return city.areaAliases[key] || (city.allowUnmappedAreas ? cleaned : "null");
 }
 
+function normalizeFieldName(value) {
+  return String(value).toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 function getField(record, names) {
   for (const name of names) {
     if (record[name] !== undefined && record[name] !== null && String(record[name]).trim() !== "") {
       return String(record[name]).trim();
     }
   }
+
+  const normalizedRecordKeys = Object.keys(record).reduce((lookup, key) => {
+    lookup[normalizeFieldName(key)] = key;
+    return lookup;
+  }, {});
+
+  for (const name of names) {
+    const matchingKey = normalizedRecordKeys[normalizeFieldName(name)];
+    if (
+      matchingKey &&
+      record[matchingKey] !== undefined &&
+      record[matchingKey] !== null &&
+      String(record[matchingKey]).trim() !== ""
+    ) {
+      return String(record[matchingKey]).trim();
+    }
+  }
+
   return "null";
 }
 
@@ -296,7 +324,11 @@ function renderSnapshot() {
 
   if (els.dataSource) els.dataSource.textContent = city.source;
   if (els.selectedCity) els.selectedCity.textContent = city.name;
-  if (els.recordLimit) els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
+  if (els.recordLimit) {
+    els.recordLimit.textContent = city.apiUrls
+      ? `${RECORD_LIMIT.toLocaleString()} per file`
+      : RECORD_LIMIT.toLocaleString();
+  }
   if (els.totalNeighborhoods) els.totalNeighborhoods.textContent = state.neighborhoods.length.toLocaleString();
   if (els.cityAverage) els.cityAverage.textContent = `${formatTenths(cityAvg)} hrs / ${formatTenths(cityAvg / 24)} days`;
   if (els.fastestArea) els.fastestArea.textContent = fastest ? fastest.neighborhood : "--";
@@ -498,7 +530,11 @@ function renderLoading(city) {
   if (els.citySelect) els.citySelect.value = state.cityKey;
   if (els.dataSource) els.dataSource.textContent = city.source;
   if (els.selectedCity) els.selectedCity.textContent = city.name;
-  if (els.recordLimit) els.recordLimit.textContent = RECORD_LIMIT.toLocaleString();
+  if (els.recordLimit) {
+    els.recordLimit.textContent = city.apiUrls
+      ? `${RECORD_LIMIT.toLocaleString()} per file`
+      : RECORD_LIMIT.toLocaleString();
+  }
   if (els.totalNeighborhoods) els.totalNeighborhoods.textContent = "--";
   if (els.cityAverage) els.cityAverage.textContent = "--";
   if (els.fastestArea) els.fastestArea.textContent = "--";
@@ -510,18 +546,43 @@ function renderLoading(city) {
   if (els.simResults) els.simResults.innerHTML = "";
 }
 
+async function fetchDataset(url, city) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`${city.name} data request failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (data && data.success === false) {
+    throw new Error(data.error?.message || `${city.name} data request failed`);
+  }
+
+  return data;
+}
+
+async function fetchDatasetWithFallback(url, city) {
+  try {
+    return await fetchDataset(url, city);
+  } catch (error) {
+    if (!url.includes("&sort=")) {
+      throw error;
+    }
+
+    const fallbackUrl = url.replace(/&sort=[^&]+/, "");
+    console.warn(`Retrying ${city.name} data request without sort.`, error);
+    return fetchDataset(fallbackUrl, city);
+  }
+}
+
 async function loadData() {
   const city = currentCity();
   renderLoading(city);
 
   try {
-    const response = await fetch(city.apiUrl);
-    if (!response.ok) {
-      throw new Error(`${city.name} data request failed with status ${response.status}`);
-    }
+    const urls = city.apiUrls || [city.apiUrl];
+    const responses = await Promise.all(urls.map((url) => fetchDatasetWithFallback(url, city)));
 
-    const data = await response.json();
-    const records = extractRecords(data, city);
+    const records = responses.flatMap((data) => extractRecords(data, city));
     state.requests = parseRecords(records, city);
     state.neighborhoods = buildNeighborhoodStats(state.requests);
     renderAll();

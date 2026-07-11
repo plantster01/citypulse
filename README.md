@@ -2,8 +2,6 @@
 
 CityPulse is a civic data dashboard that turns public 311 service request records into area-level accountability metrics. It helps residents, advocates, and officials see where city service requests are resolved quickly, where delays appear, and how response-time goals affect different neighborhoods or boroughs.
 
-The project began as a Java data-analysis application and has been rebuilt as a public-facing static website for GitHub Pages.
-
 ## Live Site
 
 https://plantster01.github.io/citypulse/
@@ -21,14 +19,12 @@ https://plantster01.github.io/citypulse/
 
 CityPulse currently supports public 311 datasets from Boston, New York City, and San Francisco.
 
-1. The website requests recently closed public 311 records from the selected city’s open data API.
+1. The website requests the most recently closed public 311 records from the selected city’s open data API.
 2. It keeps closed requests with valid area names and open/closed timestamps.
 3. It uses a 30-day outlier guard so rare old closures do not distort the averages.
 4. It calculates how many hours each request took to resolve.
 5. It groups requests by area.
 6. It ranks areas using only places with at least 25 tickets to avoid tiny-sample distortion.
-
-The site runs entirely in the browser. There is no backend server, database, or private data collection.
 
 ## Data Source
 
@@ -45,4 +41,4 @@ San Francisco dataset: 311 Cases
 San Francisco portal: DataSF  
 San Francisco API used: https://data.sfgov.org/resource/vw6y-z8j6.json
 
-CityPulse currently requests up to 25,000 recently closed public records from each selected city source file.
+CityPulse currently requests the 25,000 most recently closed public records from each selected city source file.

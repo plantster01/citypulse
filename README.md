@@ -1,6 +1,6 @@
 # CityPulse
 
-CityPulse is a civic data dashboard that turns public 311 service request records into area-level accountability metrics. It helps residents, advocates, and officials see where city service requests are resolved quickly, where delays appear, and how response-time goals affect different neighborhoods or boroughs.
+CityPulse is a civic data dashboard that turns public 311 service request records into area-level accountability metrics. It helps residents and officials see where city service requests are resolved quickly, where delays appear, and how response-time goals affect different neighborhoods or boroughs.
 
 ## Live Site
 
